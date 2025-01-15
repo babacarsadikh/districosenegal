@@ -1,0 +1,117 @@
+import { AsyncPipe, DecimalPipe } from '@angular/common';
+import { Component, QueryList, ViewChildren } from '@angular/core';
+import { Observable } from 'rxjs';
+
+import { Country } from '../../../shared/models/country.model';
+import { CountryService } from '../../../shared/services/country.service';
+import { NgbdSortableHeader, SortEvent } from '../../../shared/directives/sortable.directive';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
+import { NgbHighlight, NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { DataLayerService } from 'src/app/shared/services/data-layer.service';
+import { ToastrService } from 'ngx-toastr';
+
+
+
+
+@Component({
+  selector: 'app-listchauffeur',
+  standalone: false,
+  templateUrl: './listchauffeur.component.html',
+  styleUrl: './listchauffeur.component.scss',
+  providers: [CountryService, DecimalPipe],
+
+})
+export class ListchauffeurComponent {
+  chauffeurForm: FormGroup;
+
+  confirmResut;
+  chauffeurs: any=[];
+  countries$: Observable<Country[]>;
+  total$: Observable<number>;
+
+  @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
+
+  constructor(
+
+    public service: CountryService,
+    private dl: DataLayerService,
+    private modalService: NgbModal,
+    private toastr: ToastrService,
+    private fb: FormBuilder
+  ) {
+    this.chauffeurForm = this.fb.group({
+      nom: [''], // Champ pour le nom
+      telephone: [''], // Champ pour le téléphone
+      plaque_camion: [''], // Champ pour la plaque du camion
+    });
+    this.countries$ = service.countries$;
+    this.total$ = service.total$;
+  }
+  ngOnInit() {
+
+    this.loadChauffeurs();
+
+
+}
+saveitfist (valeur){
+  this.dl.ajouterchauffeur(valeur)
+      .subscribe(res => {
+          console.log(res)
+      })
+}
+onSaveChauffeur(modal: any): void {
+
+  if (this.chauffeurForm.valid) {
+    this.saveitfist (this.chauffeurForm.value)
+    modal.close();
+  } else {
+    console.error('Formulaire invalide');
+  }
+}
+  loadChauffeurs() {
+    this.dl.getAllchauffer()
+        .subscribe(res => {
+            this.chauffeurs=res
+            this.chauffeurs = this.chauffeurs.chauffeurs
+           console.log(this.chauffeurs)
+
+        });
+}
+  onSort({ column, direction }: SortEvent) {
+    // resetting other headers
+    this.headers.forEach((header) => {
+      if (header.sortable !== column) {
+        header.direction = '';
+      }
+    });
+
+    this.service.sortColumn = column;
+    this.service.sortDirection = direction;
+  }
+  open(content) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' })
+    .result.then((result) => {
+      console.log(result);
+    }, (reason) => {
+      console.log('Err!', reason);
+    });
+  }
+  openSmall(content) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', size: 'sm' })
+    .result.then((result) => {
+      console.log(result);
+    }, (reason) => {
+      console.log('Err!', reason);
+    });
+  }
+
+  confirm(content) {
+    this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title', centered: true })
+    .result.then((result) => {
+      this.confirmResut = `Closed with: ${result}`;
+    }, (reason) => {
+      this.confirmResut = `Dismissed with: ${reason}`;
+    });
+  }
+}
+

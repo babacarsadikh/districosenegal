@@ -1,0 +1,173 @@
+<div class="">
+  <div class="breadcrumb">
+      <h1>GESTION CHAUFFEURS</h1>
+      <!-- <ul>
+          <li><a href="#">Data Table</a></li>
+          <li>Bootstrap Table</li>
+      </ul> -->
+  </div>
+
+  <div class="separator-breadcrumb border-top"></div>
+  <div class="row">
+    <div class="col col-lg-4">
+      <div class="row">
+        <div class="col">
+          <div class="card mb-4">
+            <div class="card-body">
+              <!-- <div class="card-title m-0">Network Stats</div>
+              <p class="text-small text-muted">Lorem ipsum dolor sit amet consectetur.</p> -->
+              <div class="row">
+                <div class="col-lg-6 col-md-4 mb-4">
+                  <button  (click)="open(modalBasic)" class="btn p-0 border-0 bg-transparent">
+                    <div class="p-4 rounded d-flex align-items-center bg-primary text-white">
+                      <i class="i-Add-User text-32 me-3"></i>
+                      <div>
+                        <h4 class="text-18 mb-1 text-white">Nouveau chauffeur</h4>
+
+                      </div>
+                    </div>
+                  </button>
+
+                </div>
+                <div class="col-lg-6 col-md-4 mb-4">
+                  <button class="btn p-0 border-0 bg-transparent">
+                    <div class="p-4 rounded d-flex align-items-center bg-primary text-white">
+                      <i class="i-Jeep text-32 me-3"></i>
+                      <div>
+                        <h4 class="text-18 mb-1 text-white">Camions</h4>
+                        <!-- <span>Total: 302</span> -->
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                <div class="col-lg-6 col-md-4 mb-4">
+                  <div class="p-4 rounded d-flex align-items-center bg-primary text-white">
+                    <i class="i-Big-Data text-32 me-3"></i>
+                    <div>
+                      <h4 class="text-18 mb-1 text-white">Rapports</h4>
+                      <!-- <span>Total: 302</span> -->
+                    </div>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+    <div class="col col-lg-8">
+      <div class="card o-hidden">
+          <div class="mb-3 row px-3 py-3">
+            <label for="table-complete-search" class="col-xs-3 col-sm-auto col-form-label">Full text search:</label>
+            <div class="col-xs-3 col-sm-auto">
+              <input id="table-complete-search" type="text" class="form-control" name="searchTerm" />
+            </div>
+          </div>
+
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col" >#</th>
+                <th scope="col"  >Prénom et Nom</th>
+                <th scope="col"  >Téléphone</th>
+                <th scope="col"  >Plaque Camion</th>
+                <th scope="col"  >Action</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of chauffeurs;">
+                  <th scope="row" class="ps-3">{{ c.id }}</th>
+                  <td>{{ c.nom }}</td>
+                  <td>{{ c.telephone }}</td>
+                  <td>{{ c.plaque_camion }}</td>
+                  <!-- <td>
+                      <div class="badge" [ngClass]="{
+                          'text-bg-success': invoice.statut === 'Livrée',
+                          'text-bg-warning': invoice.statut === 'En cours',
+                          'text-bg-danger': invoice.statut === 'En attente'
+                      }">
+                          {{ invoice.statut }}
+                      </div>
+                  </td> -->
+                  <td>
+                      <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/chauffeur/edit', c.id]">voir</button>
+                      <!-- <button class="btn btn-outline-danger" (click)="deleteInvoice(invocice.id, deleteConfirmModal)">Delete</button> -->
+                  </td>
+              </tr>
+          </tbody>
+          </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+<ng-template #modalBasic let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">AJOUTER UN CHAUFFEUR</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <!-- Formulaire avec [formGroup] -->
+    <form [formGroup]="chauffeurForm">
+      <!-- Champ Nom -->
+      <div class="form-group mb-3">
+        <label for="nomChauffeur">Nom</label>
+        <input
+          id="nomChauffeur"
+          type="text"
+          class="form-control"
+          formControlName="nom"
+          placeholder="Entrez le nom du chauffeur"
+        />
+      </div>
+
+      <!-- Champ Téléphone -->
+      <div class="form-group mb-3">
+        <label for="telephone">Téléphone</label>
+        <input
+          id="telephone"
+          type="text"
+          class="form-control"
+          formControlName="telephone"
+          placeholder="Entrez le numéro de téléphone"
+        />
+      </div>
+
+      <!-- Champ Plaque Camion -->
+      <div class="form-group mb-3">
+        <label for="plaqueCamion">Plaque Camion</label>
+        <input
+          id="plaqueCamion"
+          type="text"
+          class="form-control"
+          formControlName="plaque_camion"
+          placeholder="Entrez la plaque du camion"
+        />
+      </div>
+
+
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      (click)="onSaveChauffeur(modal)"
+    >
+      Enregistrer
+    </button>
+    <button
+      type="button"
+      class="btn btn-danger btn-rounded"
+      (click)="modal.dismiss('Cancel click')"
+    >
+      Annuler
+    </button>
+  </div>
+</ng-template>
