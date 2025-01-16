@@ -12,6 +12,9 @@
     "build:blue": "ng build --configuration production --base-href \"http://gull.ui-lib.com/blue/\"",
     "build:purple": "ng build --configuration production --base-href \"http://gull.ui-lib.com/purple/\""
   },
+  "engines": {
+  "node": ">=18.x"
+},
   "private": true,
   "dependencies": {
     "@angular/animations": "^18.0.3",
