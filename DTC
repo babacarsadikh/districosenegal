@@ -1,0 +1,42 @@
+@echo off
+echo ================================
+echo LANCEMENT DES SERVICES EN LOCAL
+echo ================================
+
+REM Démarrer MySQL
+echo [1/3] Démarrage du serveur MySQL...
+net start mysql
+if %errorlevel% neq 0 (
+    echo Erreur : Impossible de démarrer MySQL. Verifiez si MySQL est installé correctement.
+    pause
+    exit /b
+)
+echo MySQL démarré avec succès.
+
+REM Démarrer l'API Python
+echo [2/3] Lancement de l'API Python...
+cd "C:\chemin\vers\votre\api"
+start cmd /k python app.py
+if %errorlevel% neq 0 (
+    echo Erreur : Impossible de lancer l'API Python. Verifiez la configuration et les dépendances.
+    pause
+    exit /b
+)
+echo API Python démarrée avec succès.
+
+REM Démarrer le serveur Angular
+echo [3/3] Lancement de l'application Angular...
+cd "C:\chemin\vers\dist"
+start cmd /k http-server
+if %errorlevel% neq 0 (
+    echo Erreur : Impossible de lancer l'application Angular. Vérifiez la configuration et les dépendances.
+    pause
+    exit /b
+)
+echo Application Angular démarrée avec succès.
+
+REM Fin
+echo ================================
+echo TOUS LES SERVICES SONT OPÉRATIONNELS !
+echo ================================
+pause
