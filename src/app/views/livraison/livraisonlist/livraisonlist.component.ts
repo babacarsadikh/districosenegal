@@ -111,16 +111,10 @@ export class LivraisonlistComponent implements OnInit {
         pdf.text("Merci pour votre confiance.", 10, pageHeight - 20);
         pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
 
-        // Ouvrir le PDF dans une nouvelle fenêtre pour impression
-        const pdfData = pdf.output("dataurlstring");
-        const printWindow = window.open();
-        if (printWindow) {
-          printWindow.document.write(
-            `<iframe width='100%' height='100%' src='${pdfData}' frameborder='0' ></iframe>`
-          );
-        } else {
-          console.error("La fenêtre de l’imprimante ne peut pas être ouverte.");
-        }
+        // Activer l'impression directe
+        pdf.autoPrint(); // Activer le mode d'impression
+        const pdfBlob = pdf.output('bloburl'); // Obtenir un URL blob
+        window.open(pdfBlob); // Lancer directement la fenêtre d'impression
       };
 
       img.onerror = () => {
