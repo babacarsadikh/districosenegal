@@ -23,7 +23,7 @@ export class SigninComponent implements OnInit {
     ngOnInit() {
         this.router.events.subscribe(event => {
             if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
-                this.loadingText = 'Loading Dashboard Module...';
+                this.loadingText = '...';
 
                 this.loading = true;
             }
@@ -40,10 +40,10 @@ export class SigninComponent implements OnInit {
 
     signin() {
         this.loading = true;
-        this.loadingText = 'Sigining in...';
+        this.loadingText = 'Connexion en cours ...';
         this.auth.signin(this.signinForm.value)
             .subscribe(res => {
-                this.router.navigateByUrl('/dashboard/v1');
+                this.router.navigateByUrl('/dashboard/v2');
                 this.loading = false;
             });
     }

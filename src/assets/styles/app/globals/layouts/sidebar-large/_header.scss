@@ -14,7 +14,7 @@
             width: 90px;
             display: flex;
             flex-direction: column;
-            align-items: center;       
+            align-items: center;
             cursor: pointer;
             margin-right: 12px;
             div {
@@ -24,7 +24,7 @@
                 margin: 3px 0;
             }
         }
-    
+
         .search-bar {
             display: flex;
             align-items: center;
@@ -52,12 +52,12 @@
                 display: inline-block;
             }
         }
-    
+
         .logo {
             width: $sidebar-left-width;
             img {
-                width: 60px;
-                height: 60px;
+                width: auto;
+                height: auto;
                 margin: 0 auto;
                 display: block;
             }
@@ -121,7 +121,7 @@
                     background: inherit;
                 }
             }
-            
+
         }
     }
 }
@@ -135,7 +135,7 @@
             }
             .menu-toggle {
                 width: 24px;
-                margin-right: 36px;       
+                margin-right: 36px;
             }
         }
     }
@@ -156,7 +156,7 @@
         .main-header {
             .menu-toggle {
                 width: 24px;
-                margin-right: 36px;       
+                margin-right: 36px;
             }
         }
     }
@@ -187,7 +187,7 @@
             left: -180px !important;
         }
     }
-    
+
 
 }
 
@@ -199,6 +199,6 @@
             }
         }
     }
-    
+
 
 }

@@ -6,10 +6,10 @@
 
 <div class="row mb-3">
   <div class="col-md-12 mb-4">
-      <button class="btn btn-primary float-right" [routerLink]="['/bonlivraison/new']">
+      <!-- <button class="btn btn-primary float-right" [routerLink]="['/bonlivraison/new']">
         <i class="i-Add"></i>
 
-        AJOUTER UN BON DE LIVRAISON</button>
+        AJOUTER UN BON DE LIVRAISON</button> -->
   </div>
   <div class="col-md-12">
       <div class="card o-hidden">
@@ -19,7 +19,7 @@
                       <th scope="col" class="ps-3">#</th>
                       <th scope="col">NOM CLIENT</th>
                       <th scope="col">ADDRESSE CHANTIER</th>
-                      <th scope="col">QUANTITÉ</th>
+                      <th scope="col">PRODUCTION (m³)</th>
                       <th scope="col">FORMULATION </th>
                       <th scope="col">Date</th>
                       <th scope="col">Status</th>
@@ -31,7 +31,7 @@
                       <th scope="row" class="ps-3">{{ invoice.id }}</th>
                       <td>{{ invoice.nomclient }}</td>
                       <td>{{ invoice.adresse_chantier }}</td>
-                      <td>{{ invoice.quantite_commande }}</td>
+                      <td>{{ invoice.quantite_charge }}</td>
                       <td>{{ invoice.formulation }}</td>
                       <td>{{ invoice.date_commande }}</td>
 

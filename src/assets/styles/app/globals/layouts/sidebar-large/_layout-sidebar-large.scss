@@ -26,7 +26,7 @@
         .navigation-left {
             list-style: none;
             text-align: center;
-            width: $sidebar-left-width;
+            width: 130px;
             height: 100%;
             margin: 0;
             padding: 0;
@@ -99,10 +99,10 @@
         .childNav {
             list-style: none;
             padding: 0;
-            
+
             li.nav-item {
                 display: block;
-                
+
                 a {
                     color: $heading;
                     text-transform: capitalize;
