@@ -46,7 +46,9 @@
                       </td>
                       <td>
                           <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/bonlivraison/edit', invoice.id]"><i class="i-Eye"></i></button>
-                          <button class="btn btn-outline-danger" (click)="deleteInvoice(invoice.id, deleteConfirmModal)"><i class="i-Remove-Basket"></i></button>
+                          <button class="btn btn-wide btn-outline-secondary me-3" (click)="print(invoice)" ><i class="i-Receipt"></i></button>
+                          <button class="btn btn-outline-danger me-3" (click)="deleteInvoice(invoice.id, deleteConfirmModal)"><i class="i-Remove-Basket"></i></button>
+
                       </td>
                   </tr>
               </tbody>

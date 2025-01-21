@@ -115,7 +115,7 @@
         <!-- Header Section -->
         <div class="d-flex mb-5" *ngIf="viewMode === 'edit'">
           <span class="m-auto"></span>
-          <button class="btn btn-outline-secondary me-3" (click)="viewMode = 'view'">Annuler</button>
+          <button class="btn btn-outline-secondary me-3" routerLink="/bonlivraison">Annuler</button>
           <btn-loading btnClass="btn-primary" [loading]="saving" (click)="updateCommande()">Enregistrer</btn-loading>
         </div>
         <div class="d-sm-flex mb-5" *ngIf="viewMode !== 'edit'">

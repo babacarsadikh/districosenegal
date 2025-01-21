@@ -246,8 +246,10 @@ export class LivraisondetailsComponent implements OnInit, OnDestroy {
   }
 
 
-  print(): void {
-
+  print() {
+    if (window) {
+      window.print();
+  }
   }
 
   ngOnDestroy() {

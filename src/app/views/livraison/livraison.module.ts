@@ -6,6 +6,7 @@ import { LivraisonRoutingModule } from './livraison-routing.module';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
+import { NgxPrintModule } from 'ngx-print';
 
 
 
@@ -14,10 +15,12 @@ import { SharedComponentsModule } from 'src/app/shared/components/shared-compone
   imports: [
     CommonModule,
     LivraisonRoutingModule,
-      FormsModule,
-        ReactiveFormsModule,
-        SharedComponentsModule,
-        NgbModule,
+    FormsModule,
+    ReactiveFormsModule,
+    SharedComponentsModule,
+    NgbModule,
+    NgxPrintModule
+
   ],
   declarations: [LivraisonlistComponent,LivraisondetailsComponent],
 
