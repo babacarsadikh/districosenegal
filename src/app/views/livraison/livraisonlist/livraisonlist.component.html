@@ -11,50 +11,65 @@
 
         AJOUTER UN BON DE LIVRAISON</button> -->
   </div>
+ <div class="row">
   <div class="col-md-12">
-      <div class="card o-hidden">
-          <table class="table table-hover mb-0">
-              <thead>
-                  <tr>
-                      <th scope="col" class="ps-3">#</th>
-                      <th scope="col">NOM CLIENT</th>
-                      <th scope="col">ADDRESSE CHANTIER</th>
-                      <th scope="col">PRODUCTION (m³)</th>
-                      <th scope="col">FORMULATION </th>
-                      <th scope="col">Date</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Actions </th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr *ngFor="let invoice of commandes;">
-                      <th scope="row" class="ps-3">{{ invoice.id }}</th>
-                      <td>{{ invoice.nomclient }}</td>
-                      <td>{{ invoice.adresse_chantier }}</td>
-                      <td>{{ invoice.quantite_charge }}</td>
-                      <td>{{ invoice.formulation }}</td>
-                      <td>{{ invoice.date_commande }}</td>
+    <div class="card o-hidden">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nom Client</th>
+            <th scope="col">Adresse</th>
+            <th scope="col">Quantité Chargée</th>
+            <th scope="col">Formule</th>
+            <th scope="col">Date de Production</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (com of (commandes ); track com.id) {
+            <tr>
+              <th scope="row">{{ com.id }}</th>
+              <td>{{ com.nom_client }}</td>
+              <td>{{ com.id_adresse }}</td>
+              <td>{{ com.quantite_chargee }}</td>
+              <td>{{ com.formule }}</td>
+              <td>{{ com.date_production }}</td>
+              <td>
+                <button class="btn btn-wide btn-outline-secondary me-3" (click)="print(com)">
+                  <i class="i-Receipt"></i>
+                </button>
+                <button class="btn btn-outline-danger me-3" (click)="deleteInvoice(com.id, deleteConfirmModal)">
+                  <i class="i-Remove-Basket"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+         <div class="d-flex justify-content-between p-2">
+                    <!-- <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
+                    </ngb-pagination> -->
+                    <!-- <ngb-pagination
+                    [collectionSize]="collectionSize"
+                    [(page)]="page"
+                    [pageSize]="pageSize"
+                    (pageChange)="refreshCountries()"
+                >
+                </ngb-pagination> -->
 
-                      <td>
-                          <div class="badge" [ngClass]="{
-                              'text-bg-success': invoice.statut === 'Produit',
-                              'text-bg-warning': invoice.statut === 'En cours',
-                              'text-bg-danger': invoice.statut === 'En attente'
-                          }">
-                              {{ invoice.statut }}
-                          </div>
-                      </td>
-                      <td>
-                          <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/bonlivraison/edit', invoice.id]"><i class="i-Eye"></i></button>
-                          <button class="btn btn-wide btn-outline-secondary me-3" (click)="print(invoice)" ><i class="i-Receipt"></i></button>
-                          <button class="btn btn-outline-danger me-3" (click)="deleteInvoice(invoice.id, deleteConfirmModal)"><i class="i-Remove-Basket"></i></button>
 
-                      </td>
-                  </tr>
-              </tbody>
-          </table>
-      </div>
-  </div>
+                <!-- <select class="form-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshCountries()">
+                  <option [ngValue]="2">2 items per page</option>
+                  <option [ngValue]="4">4 items per page</option>
+                  <option [ngValue]="6">6 items per page</option>
+                </select> -->
+         </div>
+    </div>
+
+</div>
+ </div>
+
 </div>
 
 <ng-template #deleteConfirmModal let-modal>

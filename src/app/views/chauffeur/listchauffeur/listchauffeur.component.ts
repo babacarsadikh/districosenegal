@@ -28,6 +28,11 @@ export class ListchauffeurComponent {
   chauffeurs: any=[];
   countries$: Observable<Country[]>;
   total$: Observable<number>;
+  chauffeur = {
+    nom_chauffeur: '',
+    telephone: '',
+    plaque_camion: ''
+  };
 
   @ViewChildren(NgbdSortableHeader) headers: QueryList<NgbdSortableHeader>;
 
@@ -39,13 +44,7 @@ export class ListchauffeurComponent {
     private toastr: ToastrService,
     private fb: FormBuilder
   ) {
-    this.chauffeurForm = this.fb.group({
-      nom: [''], // Champ pour le nom
-      telephone: [''], // Champ pour le téléphone
-      plaque_camion: [''], // Champ pour la plaque du camion
-    });
-    this.countries$ = service.countries$;
-    this.total$ = service.total$;
+
   }
   ngOnInit() {
 
@@ -61,9 +60,10 @@ saveitfist (valeur){
 }
 onSaveChauffeur(modal: any): void {
 
-  if (this.chauffeurForm.valid) {
-    this.saveitfist (this.chauffeurForm.value)
-    modal.close();
+  if (this.chauffeur) {
+    this.saveitfist (this.chauffeur)
+    this.loadChauffeurs();
+   // modal.close();
   } else {
     console.error('Formulaire invalide');
   }
@@ -71,9 +71,8 @@ onSaveChauffeur(modal: any): void {
   loadChauffeurs() {
     this.dl.getAllchauffer()
         .subscribe(res => {
-            this.chauffeurs=res
-            this.chauffeurs = this.chauffeurs.chauffeurs
-           console.log(this.chauffeurs)
+            this.chauffeurs=res['data']
+           console.log('-->',this.chauffeurs)
 
         });
 }

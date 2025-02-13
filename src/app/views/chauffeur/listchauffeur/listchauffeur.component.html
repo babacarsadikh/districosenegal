@@ -62,12 +62,7 @@
     </div>
     <div class="col col-lg-8">
       <div class="card o-hidden">
-          <div class="mb-3 row px-3 py-3">
-            <label for="table-complete-search" class="col-xs-3 col-sm-auto col-form-label">Full text search:</label>
-            <div class="col-xs-3 col-sm-auto">
-              <input id="table-complete-search" type="text" class="form-control" name="searchTerm" />
-            </div>
-          </div>
+
 
           <table class="table table-hover">
             <thead>
@@ -82,8 +77,8 @@
             </thead>
             <tbody>
               <tr *ngFor="let c of chauffeurs;">
-                  <th scope="row" class="ps-3">{{ c.id }}</th>
-                  <td>{{ c.nom }}</td>
+                  <th scope="row" class="ps-3">{{ c.id_chauffeur }}</th>
+                  <td>{{ c.nom_chauffeur }}</td>
                   <td>{{ c.telephone }}</td>
                   <td>{{ c.plaque_camion }}</td>
                   <!-- <td>
@@ -96,7 +91,7 @@
                       </div>
                   </td> -->
                   <td>
-                      <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/chauffeur/edit', c.id]">voir</button>
+                      <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/chauffeur/edit', c.id_chauffeur]">voir</button>
                       <!-- <button class="btn btn-outline-danger" (click)="deleteInvoice(invocice.id, deleteConfirmModal)">Delete</button> -->
                   </td>
               </tr>
@@ -113,46 +108,45 @@
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <!-- Formulaire avec [formGroup] -->
-    <form [formGroup]="chauffeurForm">
-      <!-- Champ Nom -->
-      <div class="form-group mb-3">
-        <label for="nomChauffeur">Nom</label>
-        <input
-          id="nomChauffeur"
-          type="text"
-          class="form-control"
-          formControlName="nom"
-          placeholder="Entrez le nom du chauffeur"
-        />
-      </div>
+    <!-- Formulaire avec ngModel -->
+    <!-- Champ Nom -->
+    <div class="form-group mb-3">
+      <label for="nomChauffeur">Nom</label>
+      <input
+        id="nomChauffeur"
+        type="text"
+        class="form-control"
+        [(ngModel)]="chauffeur.nom_chauffeur"
+        name="nom_chauffeur"
+        placeholder="Entrez le nom du chauffeur"
+      />
+    </div>
 
-      <!-- Champ Téléphone -->
-      <div class="form-group mb-3">
-        <label for="telephone">Téléphone</label>
-        <input
-          id="telephone"
-          type="text"
-          class="form-control"
-          formControlName="telephone"
-          placeholder="Entrez le numéro de téléphone"
-        />
-      </div>
+    <!-- Champ Téléphone -->
+    <div class="form-group mb-3">
+      <label for="telephone">Téléphone</label>
+      <input
+        id="telephone"
+        type="text"
+        class="form-control"
+        [(ngModel)]="chauffeur.telephone"
+        name="telephone"
+        placeholder="Entrez le numéro de téléphone"
+      />
+    </div>
 
-      <!-- Champ Plaque Camion -->
-      <div class="form-group mb-3">
-        <label for="plaqueCamion">Plaque Camion</label>
-        <input
-          id="plaqueCamion"
-          type="text"
-          class="form-control"
-          formControlName="plaque_camion"
-          placeholder="Entrez la plaque du camion"
-        />
-      </div>
-
-
-    </form>
+    <!-- Champ Plaque Camion -->
+    <div class="form-group mb-3">
+      <label for="plaqueCamion">Plaque Camion</label>
+      <input
+        id="plaqueCamion"
+        type="text"
+        class="form-control"
+        [(ngModel)]="chauffeur.plaque_camion"
+        name="plaque_camion"
+        placeholder="Entrez la plaque du camion"
+      />
+    </div>
   </div>
   <div class="modal-footer">
     <button

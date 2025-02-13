@@ -122,7 +122,7 @@
           <span class="m-auto"></span>
           <button class="btn btn-outline-secondary me-3 mb-sm-0 mb-3" routerLink="/bonlivraison">Retour à la liste</button>
           <button class="btn btn-outline-secondary me-3 mb-sm-0 mb-3" (click)="viewMode = 'edit'">Modifier</button>
-          <button class="btn btn-primary mb-sm-0 mb-3" (click)="print()">Imprimer BON DE LIVRAISON</button>
+          <button class="btn btn-primary mb-sm-0 mb-3" (click)="print(invoice)">Imprimer BON DE LIVRAISON</button>
         </div>
         <!-- View Mode Area -->
         <div id="print-area" *ngIf="viewMode === 'print'">

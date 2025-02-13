@@ -2,3 +2,15 @@ td , th{
   font-size: 1rem;
 
 }
+.bg-orange {
+  background-color: orange !important;
+}
+.quantite-reste-positive {
+  background-color: #eb5151; /* Rouge clair */
+}
+.quantite-reste-nulle {
+  background-color: #05c63f; /* Rouge clair */
+}
+.plusbtn {
+  height: 130%;
+}

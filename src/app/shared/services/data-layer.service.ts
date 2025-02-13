@@ -27,26 +27,62 @@ export class DataLayerService {
     private _total$ = new BehaviorSubject<number>(0);
 
 
-
     // L'URL de base de l'API Flask locale
     private apiUrl = 'http://localhost:5000';
    // private apiUrl = 'https://5854-2001-4278-51-4c8e-11ea-2afb-c1b0-b3ce.ngrok-free.app';
 
     constructor(private http: HttpClient) { }
 
-    getInvoices() {
-        return this.http.get<any[]>(`${this.apiUrl}/getAllCommande`);
+    getInvoices() : Observable<any[]>{
+        return this.http.get<any[]>(`${this.apiUrl}/rapports`);
     }
+    getLivraison () :Observable<any[]>{
+      return this.http.get<any[]>(`${this.apiUrl}/livraisons`);
+  }
+  getLivraisonEvolution (date ) :Observable<any[]>{
+    return this.http.get<any[]>(`${this.apiUrl}/livraisons/evolution/date?date=${date}`);
+}
+getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/livraisons/evolution/plage-dates?date_debut=${date_debut}&date_fin=${date_fin}`);
+}
 
+    getCommandes(): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/commandes`);
+    }
+    getCommandesLen(): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/commandes/date?date=`);
+    }
+    getClients(): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/clients`);
+    }
+    addClient(client: any): Observable<any> {
+      return this.http.post<any>(`${this.apiUrl}/clients`, client);
+    }
+    createLivraison (livraisons: any){
+      return this.http.post<any[]>(`${this.apiUrl}/livraisons`, livraisons);
+
+     }
+     createCommande (livraisons: any){
+      return this.http.post<any[]>(`${this.apiUrl}/commandes`, livraisons);
+
+     }
+     getAdressesChantier () {
+      return this.http.get<any[]>(`${this.apiUrl}/adresses`);
+
+     }
+     AdressesChantier (adresses : any) {
+      return this.http.post<any[]>(`${this.apiUrl}/adresses`, adresses);
+
+     }
     getInvoice(id) {
         return this.http.get<any[]>(`${this.apiUrl}/commande/${id}`);
     }
     ajouterchauffeur (chauffeur){
-      return this.http.post<any[]>(`${this.apiUrl}/ajouterChauffeur`, chauffeur);
+      return this.http.post<any[]>(`${this.apiUrl}/chauffeurs`, chauffeur);
 
     }
     getAllchauffer () {
-      return this.http.get<any[]>(`${this.apiUrl}/getAllChauffeurs`);
+      return this.http.get<any[]>(`${this.apiUrl}/chauffeurs`);
 
     }
     getTotalChauffeurs(): Observable<number> {

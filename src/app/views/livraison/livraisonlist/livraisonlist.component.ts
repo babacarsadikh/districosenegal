@@ -5,6 +5,14 @@ import { ToastrService } from 'ngx-toastr';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
+import { CountryService } from 'src/app/shared/services/country.service';
+import { DecimalPipe } from '@angular/common';
+import { Country } from 'src/app/shared/models/country.model';
+import { BonLivraison } from 'src/app/shared/models/livraison.model';
+import { Pipe, PipeTransform } from '@angular/core';
+
+import { Observable } from 'rxjs';
+import { SortEvent } from 'src/app/shared/directives/sortable.directive';
 declare module 'jspdf' {
   interface jsPDF {
       lastAutoTable: { finalY: number };
@@ -13,20 +21,63 @@ declare module 'jspdf' {
 @Component({
     selector: 'app-invoice-list',
     templateUrl: './livraisonlist.component.html',
-    styleUrls: ['./livraisonlist.component.scss']
+    styleUrls: ['./livraisonlist.component.scss'],
+    providers: [CountryService, DecimalPipe],
+
 })
 export class LivraisonlistComponent implements OnInit {
-    commandes: any=[];
+    commandes: BonLivraison[];
+    countries$: Observable<Country[]>;
+    bonCommande$: Observable<BonLivraison[]>;
+    total$: Observable<number>;
+    headers: any;
+    page = 1;
+	  pageSize = 4;
+	  collectionSize ;
+	  countries: Country[];
+
 
     constructor(
         private dl: DataLayerService,
         private modalService: NgbModal,
-        private toastr: ToastrService
-    ) { }
+        private toastr: ToastrService,
+        public service: CountryService
+    ) {
+      this.countries$ = service.countries$;
+     // this.refreshCountries();
+
+    //  this.bonCommande$ = service.countries$
+
+      this.total$ = service.total$;
+    }
 
     ngOnInit() {
         this.loadInvoices();
     }
+    onSort({ column, direction }: SortEvent) {
+        // resetting other headers
+        this.headers.forEach((header) => {
+          if (header.sortable !== column) {
+            header.direction = '';
+          }
+        });
+
+        this.service.sortColumn = column;
+        this.service.sortDirection = direction;
+      }
+    refreshCountries() {
+        if (Array.isArray(this.commandes)) {
+          this.commandes = this.commandes
+            .map((commande, i) => ({ id: i + 1, ...commande }))  // Ajouter un ID incrémental
+            .slice(
+              (this.page - 1) * this.pageSize,  // Début de la page
+              (this.page - 1) * this.pageSize + this.pageSize  // Fin de la page
+            );
+            console.log(this.commandes)
+        } else {
+          console.error('commandes n\'est pas un tableau.');
+        }
+      }
 
     print(element: any) {
       console.log('Données à imprimer > ', element);
@@ -49,12 +100,15 @@ export class LivraisonlistComponent implements OnInit {
         pdf.setFontSize(18);
         pdf.setFont("helvetica", "bold");
         pdf.text("BON DE LIVRAISON", pageWidth / 2, 50, { align: "center" });
-
-        pdf.setFontSize(12);
+// Obtenir l'heure actuelle
+        const now = new Date();
+        const heureDepart = now.toLocaleTimeString();
+        pdf.setFontSize(14);
         pdf.setFont("helvetica", "normal");
-        pdf.text("CLIENT: " + element.nomclient, 10, 60);
-        pdf.text("Adresse Chantier : " + element.adresse_chantier, 10, 65);
-        pdf.text("Téléphone : +221 77 123 45 67", 10, 70);
+        pdf.text("CLIENT: " + element.nom_client, 10, 60);
+        pdf.text("Adresse Chantier : " + element.adresse, 10, 65);
+        pdf.text("Heure départ : " + heureDepart, 10, 70);
+       // pdf.text("Heure depart : ", 10, 70);
 
         // Ligne séparatrice
         pdf.line(10, 75, 200, 75);
@@ -64,14 +118,16 @@ export class LivraisonlistComponent implements OnInit {
           startY: 80,
           head: [["Libelle", "Valeur"]], // Entêtes des colonnes
           body: [
-            ["Date de commande", element.date_commande],
+            ["Date de commande", element.date_production],
             ["Date de production", element.date_production],
-            ["Formulation", element.formulation],
-            ["Quantité Commandée", `${element.quantite_commande} m³`],
-            ["Quantité chargée", `${element.quantite_charge} m³`],
+            ["Formulation", element.formule],
+            ["Quantité Commandée", `${element.quantite_commandee} m³`],
+            ["Quantité chargée", `${element.quantite_chargee} m³`],
+            ["Quantité total chargée", `${element.quantite_totale_chargee} m³`],
+
             ["Quantité restante", `${element.quantite_restante} m³`],
-            ["Chauffeur", `${element.plaque_camion} `],
-            ["Plaque Camion", `${element.chauffeur_id} `],
+            ["Chauffeur", `${element.nom_chauffeur} `],
+            ["Plaque Camion", `${element.plaque_camion} `],
           ],
           theme: "grid",
           styles: {
@@ -114,7 +170,7 @@ export class LivraisonlistComponent implements OnInit {
         // Activer l'impression directe
         pdf.autoPrint(); // Activer le mode d'impression
         const pdfBlob = pdf.output('bloburl'); // Obtenir un URL blob
-        window.open(pdfBlob); // Lancer directement la fenêtre d'impression
+         window.open(pdfBlob); // Lancer directement la fenêtre d'impression
       };
 
       img.onerror = () => {
@@ -124,11 +180,15 @@ export class LivraisonlistComponent implements OnInit {
 
 
     loadInvoices() {
-      this.dl.getInvoices()
+      this.dl.getLivraison()
           .subscribe(res => {
               this.commandes=res
-              this.commandes = this.commandes.data
-              console.log(this.commandes)
+              this.commandes = this.commandes['data']
+              this.commandes = this.commandes.sort((a, b) => new Date(b.date_production).getTime() - new Date(a.date_production).getTime());
+
+             // console.log(' less', this.commandes['data'])
+             // this.collectionSize = this.commandes.length
+
 
           });
   }

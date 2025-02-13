@@ -95,7 +95,7 @@
           <span class="m-auto"></span>
           <button class="btn btn-outline-secondary me-3 mb-sm-0 mb-3" routerLink="/invoice">Retour à la liste</button>
           <button class="btn btn-outline-secondary me-3 mb-sm-0 mb-3" (click)="viewMode = 'edit'">Modifier</button>
-          <button class="btn btn-primary mb-sm-0 mb-3" (click)="print()">Imprimer BON DE LIVRAISON</button>
+          <button class="btn btn-primary mb-sm-0 mb-3" (click)="print(invoice)">Imprimer BON DE LIVRAISON</button>
         </div>
         <!-- View Mode Area -->
         <div id="print-area" *ngIf="viewMode !== 'edit'">
@@ -117,8 +117,8 @@
               <h5 class="font-weight-bold">Infos Produit</h5>
               <p><strong>Quantité :</strong> {{invoice.quantite_commande}} m3</p>
               <p><strong>Formulation :</strong> {{invoice.formulation}}</p>
-              <p><strong>Chauffeur :</strong> {{invoice.chauffeur}}</p>
-              <p><strong>Camion :</strong> {{invoice.plaque_camoin}}</p>
+              <p><strong>Chauffeur :</strong> {{invoice.chauffeur.plaque_camoin}}</p>
+              <p><strong>Camion :</strong> {{invoice.chauffeur.chauffeur}}</p>
 
             </div>
           </div>

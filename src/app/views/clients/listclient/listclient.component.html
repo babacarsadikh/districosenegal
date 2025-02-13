@@ -1,1 +1,107 @@
-<p>listclient works!</p>
+<div class="breadcrumb">
+  <h1>GESTION CLIENTS</h1>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+
+<div class="row mb-3">
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <button class="btn plusbtn btn-primary float-right" (click)="openNewClientModal()">
+        <i class="i-Add"></i> NOUVEAU CLIENT
+      </button>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card o-hidden">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th scope="col" class="ps-3">#</th>
+            <th scope="col">NOM CLIENT</th>
+            <th scope="col">ADRESSES</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let invoice of client" (click)="openAddAddressModal(invoice)" >
+            <th scope="row">{{ invoice.id_client }}</th>
+            <td>{{ invoice.nom_client }}</td>
+            <td>
+              <ul *ngIf="invoice.adresses.length > 0; else noAddress">
+                <li *ngFor="let adr of invoice.adresses">{{ adr.adresse }}</li>
+              </ul>
+              <ng-template #noAddress>Aucune adresse</ng-template>
+            </td>
+            <td>
+              <button class="btn btn-outline-secondary me-3" (click)="openAddAddressModal(invoice)">
+                <i class="i-Eye"></i>
+              </button>
+              <button class="btn btn-outline-danger" (click)="deleteInvoice(invoice.id_client, deleteConfirmModal); $event.stopPropagation()">
+                <i class="i-Remove-Basket"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- Modal Ajouter Adresse au Client -->
+<ng-template #addAddressModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Ajouter une Adresse </h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="addAddressForm">
+      <div class="mb-3">
+        <label for="adresse_client" class="form-label">Adresse</label>
+        <input type="text" id="adresse_client" class="form-control" formControlName="adresse" required>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">Annuler</button>
+    <button type="submit" class="btn btn-primary" [disabled]="addAddressForm.invalid" (click)="addAddress(invoice.id_client)">Ajouter</button>
+  </div>
+</ng-template>
+<!-- Modal Création Nouveau Client -->
+<ng-template #newClientModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Créer un Nouveau Client</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="newClientForm" >
+      <div class="mb-3">
+        <label for="nom_client" class="form-label">Nom du Client</label>
+        <input type="text" id="nom_client" class="form-control" formControlName="nom_client" required>
+      </div>
+      <div class="mb-3">
+        <label for="adresse_client" class="form-label">Adresse</label>
+        <input type="text" id="adresse" class="form-control" formControlName="adresse" required>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel')">Annuler</button>
+    <button type="submit" class="btn btn-primary" [disabled]="newClientForm.invalid" (click)="createClient()">Créer</button>
+  </div>
+</ng-template>
+
+<!-- Modal Confirmation de suppression -->
+<ng-template #deleteConfirmModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Supprimer commande</h4>
+    <button type="button" class="btn-close" aria-label="Close button" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Êtes-vous sûr de vouloir supprimer cette commande ?</strong></p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary btn-rounded" (click)="modal.dismiss('cancel')">Annuler</button>
+    <button type="button" class="btn btn-danger btn-rounded" (click)="modal.close('Ok')">Supprimer</button>
+  </div>
+</ng-template>

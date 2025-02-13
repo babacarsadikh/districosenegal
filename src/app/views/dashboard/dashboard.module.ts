@@ -11,17 +11,21 @@ import { SharedComponentsModule } from 'src/app/shared/components/shared-compone
 import { DashboardV2Component } from './dashboard-v2/dashboard-v2.component';
 import { DashboardV3Component } from './dashboard-v3/dashboard-v3.component';
 import { DashboardV4Component } from './dashboard-v4/dashboard-v4.component';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
     CommonModule,
+    NgApexchartsModule,
     SharedComponentsModule,
     NgxEchartsModule.forRoot({
       echarts
     }),
     NgbModule,
     NgScrollbarModule,
-    DashboardRoutingModule
+    DashboardRoutingModule,
+    FormsModule
   ],
   declarations: [DashboadDefaultComponent, DashboardV2Component, DashboardV3Component, DashboardV4Component]
 })

@@ -1,7 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { DataLayerService } from 'src/app/shared/services/data-layer.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import { Observable } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { map, startWith } from 'rxjs/operators';
 
 @Component({
     selector: 'app-invoice-list',
@@ -9,37 +14,247 @@ import { ToastrService } from 'ngx-toastr';
     styleUrls: ['./invoice-list.component.scss']
 })
 export class InvoiceListComponent implements OnInit {
-    commandes: any=[];
+  @ViewChild('confirmationLivraisonModal') confirmationLivraisonModal: any;
+    formules = ['C30', 'C25', 'C30 HYDROFUGE']
+    commandes;
+    commandeSelectionnee: any = null;
+    quantiteChargee: number = 0;
+    quantitedeCommande: number = 0;
+    chauffeurSelectionne: number =0;
+    clienselectione: number = 0;
+    formuleselectione;
+    datecommande;
+    plaqueCamion: string = '';
+    Clients;
+    chauffeurs; // Charger les chauffeurs si nécessaire
+    adresses: any[] = []; // Liste des adresses disponibles
+    adresseSelectionnee: number = 0;
+    filteredAdresses!: Observable<any[]>;
+    adresseCtrl = new FormControl('');
 
     constructor(
         private dl: DataLayerService,
         private modalService: NgbModal,
         private toastr: ToastrService
-    ) { }
+    ) {
+
+     }
 
     ngOnInit() {
-        this.loadInvoices();
+        this.loadCommandes();
+        this.loadChauffeurs();
+        this.loadAdresses();
+        this.loadClient();
+
+    }
+    private _filter(value: string): any[] {
+      const filterValue = value.toLowerCase();
+      return this.adresses.filter(adresse =>
+        adresse.adresse.toLowerCase().includes(filterValue)
+      );
+    }
+    loadAdresses() {
+      this.dl.getAdressesChantier().subscribe(res => {
+        this.adresses = res['data'];
+        console.log(this.adresses);
+        this.filteredAdresses = this.adresseCtrl.valueChanges.pipe(
+          startWith(''),
+          map(value => this._filter(value || ''))
+        );
+      });
+    }
+    loadClient() {
+      this.dl.getClients().subscribe(res => {
+        this.Clients = res['data'];
+      });
+    }
+    loadCommandes() {
+        this.dl.getCommandes()
+            .subscribe(res => {
+                this.commandes = res['data'];
+                console.log(this.commandes);
+            });
     }
 
-    loadInvoices() {
-      this.dl.getInvoices()
-          .subscribe(res => {
-              this.commandes=res
-              this.commandes = this.commandes.data
-              console.log(this.commandes)
+    loadChauffeurs() {
+        this.dl.getAllchauffer()
+            .subscribe(res => {
+                this.chauffeurs = res['data'];
+                console.log(this.chauffeurs);
+            });
+    }
+    afficherPlaque() {
+      const chauffeur = this.chauffeurs.find(c => c.id === this.chauffeurSelectionne);
+      this.plaqueCamion = chauffeur ? chauffeur.plaque_camion : '';
+    }
+    openLivraisonModal(commande, modal: any) {
+        this.commandeSelectionnee = commande;
+        this.modalService.open(modal, { ariaLabelledBy: 'modal-basic-title', centered: true });
+    }
+    openCommandeModal (modal: any) {
+      this.modalService.open(modal, { ariaLabelledBy: 'modal-basic-title', centered: true });
 
-          });
-  }
+    }
 
+    confirmerLivraison(modal: any) {
+      if (!this.quantiteChargee || !this.chauffeurSelectionne) {
+        this.toastr.warning('Veuillez renseigner tous les champs.', 'Attention');
+        return;
+      }
 
-    deleteInvoice(id, modal) {
+      const livraisonData = {
+        id_commande: this.commandeSelectionnee.id_commande,
+        id_chauffeur: this.chauffeurSelectionne,
+        id_adresse: this.adresseSelectionnee  ,  // Assurez-vous que cette valeur existe
+        quantite_chargee: this.quantiteChargee,
+        heure_depart: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        date_production: new Date().toISOString().split('T')[0]
+      };
+       console.log(livraisonData)
+
+      this.dl.createLivraison(livraisonData).subscribe(
+        (res) => {
+
+          this.toastr.success('Livraison ajoutée avec succès !', 'Succès');
+          modal.close();  // Ferme le modal après confirmation
+          this.loadCommandes();  // Recharge la liste des commandes
+         // this.modalService.open(this.confirmationLivraisonModal, { centered: true });
+          this.clienselectione = null;
+        },
+        (err) => {
+          this.toastr.error('Erreur lors de l’ajout de la livraison.', 'Erreur');
+        }
+      );
+    }
+    deleteInvoice(id: number, modal: any) {
         this.modalService.open(modal, { ariaLabelledBy: 'modal-basic-title', centered: true })
             .result.then((result) => {
                 this.dl.deleteInvoice(id)
                     .subscribe(res => {
                         this.toastr.success('Bon de commande supprimé !', 'Succès!', { timeOut: 3000 });
-                        this.loadInvoices();  // Recharge la liste après la suppression
+                        this.loadCommandes();
                     });
             }, (reason) => {});
     }
+    print(element: any) {
+      console.log('Données à imprimer > ', element);
+
+      // Créer une instance jsPDF
+      const pdf = new jsPDF();
+
+      // Convertir l'image en Base64 et l'ajouter
+      const img = new Image();
+      img.src = 'assets/images/logobeton.png'; // Chemin relatif vers l'image
+      img.onload = () => {
+        // Ajouter le logo en haut au centre
+        const pageWidth = pdf.internal.pageSize.width; // Largeur de la page
+        const logoWidth = 70; // Largeur du logo
+        const logoHeight = 40; // Hauteur du logo
+        const logoX = (pageWidth - logoWidth) / 2; // Centrer horizontalement
+        pdf.addImage(img, 'PNG', logoX, 10, logoWidth, logoHeight);
+
+        // Ajouter un en-tête
+        pdf.setFontSize(18);
+        pdf.setFont("helvetica", "bold");
+        pdf.text("BON DE LIVRAISON", pageWidth / 2, 50, { align: "center" });
+// Obtenir l'heure actuelle
+        const now = new Date();
+        const heureDepart = now.toLocaleTimeString();
+        pdf.setFontSize(14);
+        pdf.setFont("helvetica", "normal");
+        pdf.text("CLIENT: " + element.nom_client, 10, 60);
+        pdf.text("Adresse Chantier : " + element.adresse, 10, 65);
+        pdf.text("Heure départ : " + heureDepart, 10, 70);
+       // pdf.text("Heure depart : ", 10, 70);
+
+        // Ligne séparatrice
+        pdf.line(10, 75, 200, 75);
+
+        // Tableau des données
+        autoTable(pdf, {
+          startY: 80,
+          head: [["Libelle", "Valeur"]], // Entêtes des colonnes
+          body: [
+            ["Date de commande", element.date_production],
+            ["Date de production", element.date_production],
+            ["Formulation", element.formule],
+            ["Quantité Commandée", `${element.quantite_commandee} m³`],
+            ["Quantité chargée", `${element.quantite_chargee} m³`],
+            ["Quantité total chargée", `${element.quantite_totale_chargee} m³`],
+
+            ["Quantité restante", `${element.quantite_restante} m³`],
+            ["Chauffeur", `${element.nom_chauffeur} `],
+            ["Plaque Camion", `${element.plaque_camion} `],
+          ],
+          theme: "grid",
+          styles: {
+            fontSize: 11,
+            cellPadding: 3,
+          },
+          headStyles: {
+            fillColor: [41, 128, 185],
+            textColor: 255,
+            halign: "center",
+          },
+          bodyStyles: {
+            halign: "left",
+          },
+          alternateRowStyles: {
+            fillColor: [245, 245, 245],
+          },
+        });
+
+        // Ajouter un espace pour la signature du client
+        const finalY = pdf.lastAutoTable.finalY + 20; // Position après le tableau
+        pdf.setFontSize(12);
+        pdf.text("Client :", 10, finalY);
+        pdf.line(30, finalY, 50, finalY); // Ligne horizontale
+
+        // Texte "Chauffeur" avec une ligne après
+        pdf.text("Chauffeur :", 75, finalY);
+        pdf.line(100, finalY, 140, finalY); // Ligne horizontale
+
+        // Texte "Opérateur" avec une ligne après
+        pdf.text("Opérateur :", 145, finalY);
+        pdf.line(175, finalY, 200, finalY);
+
+        // Ajouter un pied de page
+        const pageHeight = pdf.internal.pageSize.height;
+        pdf.setFontSize(10);
+        pdf.text("Merci pour votre confiance.", 10, pageHeight - 20);
+        pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
+
+        // Activer l'impression directe
+        pdf.autoPrint(); // Activer le mode d'impression
+        const pdfBlob = pdf.output('bloburl'); // Obtenir un URL blob
+         window.open(pdfBlob); // Lancer directement la fenêtre d'impression
+      };
+
+      img.onerror = () => {
+        console.error("Erreur lors du chargement de l'image.");
+      };
+    }
+    confirmAddCommande () {
+        const CommandeData = {
+          id_client : this.clienselectione,
+          formule : this.formuleselectione,
+          quantite_commandee: this.quantitedeCommande,
+          quantite_restante: this.quantitedeCommande,
+          date_production: this.datecommande
+        }
+        console.log(CommandeData)
+        this.dl.createCommande(CommandeData)
+        .subscribe(res =>  {
+
+          this.toastr.success('Commande ajoutée avec succès !', 'Succès');
+         // modal.close();  // Ferme le modal après confirmation
+          this.loadCommandes();  // Recharge la liste des commandes
+          this.modalService.open(this.confirmationLivraisonModal, { centered: true });
+
+        },
+        (err) => {
+          this.toastr.error('Erreur lors de l’ajout de la commande.', 'Erreur');
+        });
+    }
+
 }
