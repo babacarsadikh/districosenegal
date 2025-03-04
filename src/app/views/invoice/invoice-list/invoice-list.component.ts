@@ -234,7 +234,7 @@ export class InvoiceListComponent implements OnInit {
         console.error("Erreur lors du chargement de l'image.");
       };
     }
-    confirmAddCommande () {
+    confirmAddCommande (modal) {
         const CommandeData = {
           id_client : this.clienselectione,
           formule : this.formuleselectione,
@@ -247,9 +247,9 @@ export class InvoiceListComponent implements OnInit {
         .subscribe(res =>  {
 
           this.toastr.success('Commande ajoutée avec succès !', 'Succès');
-         // modal.close();  // Ferme le modal après confirmation
+          modal.close();  // Ferme le modal après confirmation
           this.loadCommandes();  // Recharge la liste des commandes
-          this.modalService.open(this.confirmationLivraisonModal, { centered: true });
+          //this.modalService.open(this.confirmationLivraisonModal, { centered: true });
 
         },
         (err) => {

@@ -41,8 +41,10 @@ export class DashboardV2Component implements OnInit {
   livraison;
   qtecommandes;
   commandeData;
+  nmbrelivraison;
   Datedujour;
   dateDebut;
+  totalalivre;
   dateFin;
   rapportData;
   data = [];
@@ -132,20 +134,25 @@ export class DashboardV2Component implements OnInit {
     this.getCommandeLength();
     this.getCommandeQte();
     this.getLivraisonEv();
+    this.getCommande();
+    this.getLivraisonToday();
   }
   openraaportmodel () {
     this.modalService.open(this.generationrapport, { centered: true });
 
   }
-  print(data: any[]) {
-    console.log('Données à imprimer > ', data);
-   // data =
-    // Créer une instance jsPDF
-    const pdf = new jsPDF();
+  print(data: any) {
+    console.log("Données à imprimer >", data);
 
-    // Charger l'image
+    // Vérifier que les données sont valides
+    if (!data || !data.data || typeof data.total_charge === "undefined") {
+      console.error("Données invalides ou manquantes.");
+      return;
+    }
+
+    const pdf = new jsPDF();
     const img = new Image();
-    img.src = 'assets/images/logobeton.png';
+    img.src = "assets/images/logobeton.png";
 
     img.onload = () => {
       const pageWidth = pdf.internal.pageSize.width;
@@ -154,43 +161,56 @@ export class DashboardV2Component implements OnInit {
       const logoX = (pageWidth - logoWidth) / 2;
 
       // Ajouter le logo
-      pdf.addImage(img, 'PNG', logoX, 10, logoWidth, logoHeight);
+      pdf.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
 
-      // Ajouter le titre du rapport
+      // Titre du rapport
       pdf.setFontSize(22);
       pdf.setFont("helvetica", "bold");
       pdf.text("RAPPORT DE PRODUCTION", pageWidth / 2, 55, { align: "center" });
 
-
-      // Obtenir la date et l'heure actuelles
+      // Date et heure du rapport
       const now = new Date();
       const dateReport = now.toLocaleDateString();
       const heureReport = now.toLocaleTimeString();
 
-      // Ajouter la date et l'heure du rapport
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "normal");
-      pdf.text(`TOTAL PRODUCTION: ${data['total_charge']} m³`, 10, 65);
-      pdf.text(`Date: ${this.dateFin}`, 10, 72);
+      pdf.text(`TOTAL PRODUCTION: ${data.total_charge} m³`, 10, 65);
+      pdf.text(`Date: ${dateReport} ${heureReport}`, 10, 72);
 
-      // Ligne séparatrice
-      pdf.line(10, 78, 200, 78);
+      // Ligne de séparation
+      pdf.line(10, 78, pageWidth - 10, 78);
 
-      // Préparer les données pour le tableau
-      const tableData = data['data'].map((item) => [
-        item.nom_client,
-        item.formule,
-        item.adresse,
-        `${item.total_commandee} m³`,
-        `${item.total_chargee} m³`,
-      ,
-      ]);
+      // Préparer les données du tableau récapitulatif
+      const summaryData = [];
 
-      // Générer le tableau
+      for (const client in data.data) {
+        if (data.data.hasOwnProperty(client)) {
+          for (const formule in data.data[client]) {
+            if (data.data[client].hasOwnProperty(formule)) {
+              const formuleData = data.data[client][formule];
+
+              // Utiliser les totaux fournis plutôt que de recalculer
+              const totalCommandee = formuleData.total_commandee;
+              const totalChargee = formuleData.total_chargee;
+
+              // Ajouter les totaux au tableau récapitulatif
+              summaryData.push([
+                client,
+                formule,
+                `${totalCommandee} m³`,
+                `${totalChargee} m³`
+              ]);
+            }
+          }
+        }
+      }
+
+      // Ajouter le tableau récapitulatif des totaux par client et formule
       autoTable(pdf, {
         startY: 85,
-        head: [["Clients", "Formulations", "Destinations", "QTé Commandée", "QTé Livrée"]],
-        body: tableData,
+        head: [["Clients", "Formulations", "Total Commandé", "Total Livré"]],
+        body: summaryData,
         theme: "grid",
         styles: {
           fontSize: 11,
@@ -214,9 +234,9 @@ export class DashboardV2Component implements OnInit {
       pdf.setFontSize(10);
       pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
 
-      // Ouvrir le PDF pour impression
+      // Ouvrir le PDF dans un nouvel onglet
       pdf.autoPrint();
-      const pdfBlob = pdf.output('bloburl');
+      const pdfBlob = pdf.output("bloburl");
       window.open(pdfBlob);
     };
 
@@ -225,9 +245,10 @@ export class DashboardV2Component implements OnInit {
     };
   }
 
-
   getCommandeLength (){
-    this.dl.getCommandes()
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    this.dl.getCommandesbyDATE(formattedDate)
     .subscribe(res => {
         this.commandes = res['length'];
       //  console.log(this.commandes)
@@ -243,10 +264,12 @@ export class DashboardV2Component implements OnInit {
 
   }
   getCommande (){
-    this.dl.getCommandes()
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    this.dl.getCommandesbyDATE(formattedDate)
     .subscribe(res => {
         this.qtecommandes = res['total_quantite'];
-      //  console.log(this.qtecommandes)
+        console.log('bi',this.qtecommandes)
     });
 
   }
@@ -258,6 +281,20 @@ export class DashboardV2Component implements OnInit {
         this.commandeData = res['data']
         this.total_quantite_charge = res['total_quantite_chargee']
        // console.log(this.commandeData)
+
+    });
+  }
+  getLivraisonToday (){
+    const today = new Date();
+    const formattedDate = today.toISOString().split('T')[0];
+    this.dl.getLivraisonPlageDate(formattedDate, formattedDate)
+    .subscribe(res => {
+      console.log(res)
+        this.totalalivre = res['total_charge']
+        this.nmbrelivraison = res['length']
+       // this.print(res)
+
+
 
     });
   }

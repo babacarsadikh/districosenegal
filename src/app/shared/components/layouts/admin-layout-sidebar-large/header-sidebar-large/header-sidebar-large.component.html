@@ -81,31 +81,7 @@
             </div>
         </div> -->
 
-        <div ngbDropdown [placement]="'bottom-right'">
-            <div class="badge-top-container">
-                <span class="badge p-0 position-absolute bg-danger rounded-circle d-flex justify-content-center align-items-center">{{notifications?.length}}</span>
-                <i ngbDropdownToggle class="i-Bell text-muted header-icon" role="button"></i>
-            </div>
-            <div ngbDropdownMenu class="notification-dropdown">
-                <ng-scrollbar>
-                    <div class="dropdown-item d-flex" *ngFor="let item of notifications" [routerLink]="[item.link]">
-                        <div class="notification-icon">
-                            <i class="{{item.icon}} text-{{item.status}} me-1"></i>
-                        </div>
-                        <div class="notification-details flex-grow-1">
-                            <p class="m-0 d-flex align-items-center">
-                                <span>{{item.title}}</span>
-                                <span *ngIf="item.badge"
-                                    class="badge badge-pill badge-{{item.status}} ms-1 me-1">{{item.badge}}</span>
-                                <span class="flex-grow-1"></span>
-                                <span class="text-small text-muted ms-auto">{{item.time | relativeTime}}</span>
-                            </p>
-                            <p class="text-small text-muted m-0">{{item.text | excerpt:30}}</p>
-                        </div>
-                    </div>
-                </ng-scrollbar>
-            </div>
-        </div>
+
 
         <div ngbDropdown [placement]="'bottom-right'" class="user col align-self-end">
             <img src="./assets/images/faces/user.png" id="userDropdown" ngbDropdownToggle alt="">

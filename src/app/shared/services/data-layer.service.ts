@@ -49,6 +49,9 @@ getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
     getCommandes(): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/commandes`);
     }
+    getCommandesbyDATE(date): Observable<any[]> {
+      return this.http.get<any[]>(`${this.apiUrl}/commandes/date?date=${date}`);
+    }
     getCommandesLen(): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/commandes/date?date=`);
     }
