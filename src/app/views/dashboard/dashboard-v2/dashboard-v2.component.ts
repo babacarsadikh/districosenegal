@@ -289,7 +289,7 @@ export class DashboardV2Component implements OnInit {
     const formattedDate = today.toISOString().split('T')[0];
     this.dl.getLivraisonPlageDate(formattedDate, formattedDate)
     .subscribe(res => {
-      console.log(res)
+      console.log('today :',res)
         this.totalalivre = res['total_charge']
         this.nmbrelivraison = res['length']
        // this.print(res)

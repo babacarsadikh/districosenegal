@@ -40,15 +40,7 @@
                     </div>
                   </button>
                 </div>
-                <div class="col-lg-6 col-md-4 mb-4">
-                  <div class="p-4 rounded d-flex align-items-center bg-primary text-white">
-                    <i class="i-Big-Data text-32 me-3"></i>
-                    <div>
-                      <h4 class="text-18 mb-1 text-white">Rapports</h4>
-                      <!-- <span>Total: 302</span> -->
-                    </div>
-                  </div>
-                </div>
+
 
 
               </div>
@@ -91,8 +83,7 @@
                       </div>
                   </td> -->
                   <td>
-                      <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/chauffeur/edit', c.id_chauffeur]">voir</button>
-                      <!-- <button class="btn btn-outline-danger" (click)="deleteInvoice(invocice.id, deleteConfirmModal)">Delete</button> -->
+                      <button class="btn btn-outline-danger" (click)="deleteInvoice(invocice.id, deleteConfirmModal)"><i class="i-Remove-Basket"></i></button>
                   </td>
               </tr>
           </tbody>

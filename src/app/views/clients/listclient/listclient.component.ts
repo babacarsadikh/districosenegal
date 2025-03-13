@@ -54,6 +54,9 @@ loadClients() {
     this.client = res['data'];
   });
 }
+deleteChauffeur(){
+
+}
 createClient() {
   if (this.newClientForm.valid) {
     const newClientData = this.newClientForm.value;

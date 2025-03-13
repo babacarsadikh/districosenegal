@@ -29,13 +29,15 @@ export class InvoiceListComponent implements OnInit {
     chauffeurs; // Charger les chauffeurs si nécessaire
     adresses: any[] = []; // Liste des adresses disponibles
     adresseSelectionnee: number = 0;
+    adresseLivraison: string = '';
     filteredAdresses!: Observable<any[]>;
     adresseCtrl = new FormControl('');
 
     constructor(
         private dl: DataLayerService,
         private modalService: NgbModal,
-        private toastr: ToastrService
+        private toastr: ToastrService,
+
     ) {
 
      }
@@ -97,143 +99,146 @@ export class InvoiceListComponent implements OnInit {
     }
 
     confirmerLivraison(modal: any) {
-      if (!this.quantiteChargee || !this.chauffeurSelectionne) {
+      if (!this.quantiteChargee || !this.chauffeurSelectionne || !this.adresseLivraison) {
         this.toastr.warning('Veuillez renseigner tous les champs.', 'Attention');
+        return;
+      }
+
+      if (!this.commandeSelectionnee) {
+        this.toastr.error('Aucune commande sélectionnée.', 'Erreur');
         return;
       }
 
       const livraisonData = {
         id_commande: this.commandeSelectionnee.id_commande,
         id_chauffeur: this.chauffeurSelectionne,
-        id_adresse: this.adresseSelectionnee  ,  // Assurez-vous que cette valeur existe
+        adresse: this.adresseLivraison,
         quantite_chargee: this.quantiteChargee,
         heure_depart: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         date_production: new Date().toISOString().split('T')[0]
       };
-       console.log(livraisonData)
+
+      console.log("Données envoyées à l'API :", livraisonData);
 
       this.dl.createLivraison(livraisonData).subscribe(
         (res) => {
-
-          this.toastr.success('Livraison ajoutée avec succès !', 'Succès');
-          modal.close();  // Ferme le modal après confirmation
-          this.loadCommandes();  // Recharge la liste des commandes
-         // this.modalService.open(this.confirmationLivraisonModal, { centered: true });
-          this.clienselectione = null;
+          if (res) {
+            this.toastr.success('Livraison ajoutée avec succès !', 'Succès');
+            modal.close();
+            console.log("Réponse API :", res);
+            const donnee = res['data']
+            this.print(donnee)
+            this.loadCommandes();
+            this.commandeSelectionnee = null; // Correction : `clienselectione` n'existe pas
+          } else {
+            this.toastr.error('Réponse invalide du serveur.', 'Erreur');
+          }
         },
         (err) => {
+          console.error("Erreur API :", err);
           this.toastr.error('Erreur lors de l’ajout de la livraison.', 'Erreur');
         }
       );
     }
-    deleteInvoice(id: number, modal: any) {
-        this.modalService.open(modal, { ariaLabelledBy: 'modal-basic-title', centered: true })
-            .result.then((result) => {
-                this.dl.deleteInvoice(id)
-                    .subscribe(res => {
-                        this.toastr.success('Bon de commande supprimé !', 'Succès!', { timeOut: 3000 });
-                        this.loadCommandes();
-                    });
-            }, (reason) => {});
-    }
-    print(element: any) {
-      console.log('Données à imprimer > ', element);
 
-      // Créer une instance jsPDF
-      const pdf = new jsPDF();
 
-      // Convertir l'image en Base64 et l'ajouter
-      const img = new Image();
-      img.src = 'assets/images/logobeton.png'; // Chemin relatif vers l'image
-      img.onload = () => {
-        // Ajouter le logo en haut au centre
-        const pageWidth = pdf.internal.pageSize.width; // Largeur de la page
-        const logoWidth = 70; // Largeur du logo
-        const logoHeight = 40; // Hauteur du logo
-        const logoX = (pageWidth - logoWidth) / 2; // Centrer horizontalement
-        pdf.addImage(img, 'PNG', logoX, 10, logoWidth, logoHeight);
+     print(element: any) {
+         console.log('Données à imprimer > ', element);
 
-        // Ajouter un en-tête
-        pdf.setFontSize(18);
-        pdf.setFont("helvetica", "bold");
-        pdf.text("BON DE LIVRAISON", pageWidth / 2, 50, { align: "center" });
-// Obtenir l'heure actuelle
-        const now = new Date();
-        const heureDepart = now.toLocaleTimeString();
-        pdf.setFontSize(14);
-        pdf.setFont("helvetica", "normal");
-        pdf.text("CLIENT: " + element.nom_client, 10, 60);
-        pdf.text("Adresse Chantier : " + element.adresse, 10, 65);
-        pdf.text("Heure départ : " + heureDepart, 10, 70);
-       // pdf.text("Heure depart : ", 10, 70);
+         // Créer une instance jsPDF
+         const pdf = new jsPDF();
+         // Convertir l'image en Base64 et l'ajouter
+         const img = new Image();
+         img.src = 'assets/images/logobeton.png'; // Chemin relatif vers l'image
+         img.onload = () => {
+           // Ajouter le logo en haut au centre
+           const pageWidth = pdf.internal.pageSize.width; // Largeur de la page
+           const logoWidth = 70; // Largeur du logo
+           const logoHeight = 40; // Hauteur du logo
+           const logoX = (pageWidth - logoWidth) / 2; // Centrer horizontalement
+           pdf.addImage(img, 'PNG', logoX, 10, logoWidth, logoHeight);
+           // Ajouter un en-tête
+           pdf.setFontSize(18);
+           pdf.setFont("helvetica", "bold");
+           pdf.text("BON DE LIVRAISON", pageWidth / 2, 50, { align: "center" });
+           // Obtenir l'heure actuelle
+           const now = new Date();
+           const heureDepart = now.toLocaleTimeString();
+           pdf.setFontSize(14);
+           pdf.setFont("helvetica", "normal");
+           pdf.text("CLIENT: " + element.nom_client, 10, 60);
+           pdf.text("Adresse Chantier : " + (element.adresseLivraison || element.adresse || "Non spécifiée"), 10, 65);
+           pdf.text("Heure départ : " + heureDepart, 10, 70);
+          // pdf.text("Heure depart : ", 10, 70);
 
-        // Ligne séparatrice
-        pdf.line(10, 75, 200, 75);
+           // Ligne séparatrice
+           pdf.line(10, 75, 200, 75);
 
-        // Tableau des données
-        autoTable(pdf, {
-          startY: 80,
-          head: [["Libelle", "Valeur"]], // Entêtes des colonnes
-          body: [
-            ["Date de commande", element.date_production],
-            ["Date de production", element.date_production],
-            ["Formulation", element.formule],
-            ["Quantité Commandée", `${element.quantite_commandee} m³`],
-            ["Quantité chargée", `${element.quantite_chargee} m³`],
-            ["Quantité total chargée", `${element.quantite_totale_chargee} m³`],
+           // Tableau des données
+           autoTable(pdf, {
+             startY: 80,
+             head: [["Libelle", "Valeur"]], // Entêtes des colonnes
+             body: [
+               ["Date de commande", element.date_production],
+               ["Date de production", element.date_production],
+               ["Formulation", element.formule],
+               ["Quantité Commandée", `${element.quantite_commandee} m³`],
+               ["Quantité chargée", `${element.quantite_chargee} m³`],
+               ["Quantité total chargée", `${element.quantite_totale_chargee} m³`],
 
-            ["Quantité restante", `${element.quantite_restante} m³`],
-            ["Chauffeur", `${element.nom_chauffeur} `],
-            ["Plaque Camion", `${element.plaque_camion} `],
-          ],
-          theme: "grid",
-          styles: {
-            fontSize: 11,
-            cellPadding: 3,
-          },
-          headStyles: {
-            fillColor: [41, 128, 185],
-            textColor: 255,
-            halign: "center",
-          },
-          bodyStyles: {
-            halign: "left",
-          },
-          alternateRowStyles: {
-            fillColor: [245, 245, 245],
-          },
-        });
+               ["Quantité restante", `${element.quantite_restante} m³`],
+               ["Chauffeur", `${element.nom_chauffeur} `],
+               ["Plaque Camion", `${element.plaque_camion} `],
+             ],
+             theme: "grid",
+             styles: {
+               fontSize: 11,
+               cellPadding: 3,
+             },
+             headStyles: {
+               fillColor: [41, 128, 185],
+               textColor: 255,
+               halign: "center",
+             },
+             bodyStyles: {
+               halign: "left",
+             },
+             alternateRowStyles: {
+               fillColor: [245, 245, 245],
+             },
+           });
 
-        // Ajouter un espace pour la signature du client
-        const finalY = pdf.lastAutoTable.finalY + 20; // Position après le tableau
-        pdf.setFontSize(12);
-        pdf.text("Client :", 10, finalY);
-        pdf.line(30, finalY, 50, finalY); // Ligne horizontale
+           // Ajouter un espace pour la signature du client
+           const finalY = pdf.lastAutoTable.finalY + 20; // Position après le tableau
+           pdf.setFontSize(12);
+           pdf.text("Client :", 10, finalY);
+           pdf.line(30, finalY, 50, finalY); // Ligne horizontale
 
-        // Texte "Chauffeur" avec une ligne après
-        pdf.text("Chauffeur :", 75, finalY);
-        pdf.line(100, finalY, 140, finalY); // Ligne horizontale
+           // Texte "Chauffeur" avec une ligne après
+           pdf.text("Chauffeur :", 75, finalY);
+           pdf.line(100, finalY, 140, finalY); // Ligne horizontale
 
-        // Texte "Opérateur" avec une ligne après
-        pdf.text("Opérateur :", 145, finalY);
-        pdf.line(175, finalY, 200, finalY);
+           // Texte "Opérateur" avec une ligne après
+           pdf.text("Opérateur :", 145, finalY);
+           pdf.line(175, finalY, 200, finalY);
 
-        // Ajouter un pied de page
-        const pageHeight = pdf.internal.pageSize.height;
-        pdf.setFontSize(10);
-        pdf.text("Merci pour votre confiance.", 10, pageHeight - 20);
-        pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
+           // Ajouter un pied de page
+           const pageHeight = pdf.internal.pageSize.height;
+           pdf.setFontSize(10);
+           pdf.text("Merci pour votre confiance.", 10, pageHeight - 20);
+           pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
 
-        // Activer l'impression directe
-        pdf.autoPrint(); // Activer le mode d'impression
-        const pdfBlob = pdf.output('bloburl'); // Obtenir un URL blob
-         window.open(pdfBlob); // Lancer directement la fenêtre d'impression
-      };
+           // Activer l'impression directe
+           pdf.autoPrint(); // Activer le mode d'impression
+           const pdfBlob = pdf.output('bloburl'); // Obtenir un URL blob
+            window.open(pdfBlob); // Lancer directement la fenêtre d'impression
+         };
 
-      img.onerror = () => {
-        console.error("Erreur lors du chargement de l'image.");
-      };
-    }
+         img.onerror = () => {
+           console.error("Erreur lors du chargement de l'image.");
+         };
+       }
+
     confirmAddCommande (modal) {
         const CommandeData = {
           id_client : this.clienselectione,
@@ -255,6 +260,29 @@ export class InvoiceListComponent implements OnInit {
         (err) => {
           this.toastr.error('Erreur lors de l’ajout de la commande.', 'Erreur');
         });
+    }
+    deleteInvoice(idCommande: number, deleteConfirmModal: any): void {
+      // Ouvrir la modal de confirmation
+      console.log(idCommande)
+      this.modalService.open(deleteConfirmModal).result.then(
+        (result) => {
+          if (result === 'confirm') {
+            // Si l'utilisateur confirme, supprimer la commande
+            this.dl.supprimerCommande(idCommande).subscribe(
+              (response) => {
+                this.toastr.success('Bon de commande supprimé !', 'Succès!', { timeOut: 3000 });
+                this.loadCommandes(); // Recharger la liste des commandes
+              },
+              (error) => {
+                console.error('Erreur lors de la suppression de la commande', error);
+              }
+            );
+          }
+        },
+        (reason) => {
+          console.log('Modal annulée', reason);
+        }
+      );
     }
 
 }

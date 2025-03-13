@@ -81,12 +81,8 @@
       </select>
     </div>
     <div class="mb-3">
-      <label for="adresse" class="form-label">Sélectionner l'adresse de livraison :</label>
-      <select class="form-control" [(ngModel)]="adresseSelectionnee" id="adresse">
-        <option *ngFor="let adresse of adresses" [value]="adresse.id_adresse">
-          {{ adresse.adresse }}
-        </option>
-      </select>
+      <label for="adresse" class="form-label">Adresse de livraison :</label>
+      <input type="text" class="form-control" [(ngModel)]="adresseLivraison" id="adresse" placeholder="Entrez l'adresse de livraison" />
     </div>
 
 
@@ -104,22 +100,18 @@
     <button type="button" class="btn-close" aria-label="Close button" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <div class="mb-3">
-      <label for="client" class="form-label">Sélectionner Client :</label>
-      <div class="input-group">
-        <select class="form-control" [(ngModel)]="clienselectione" id="client">
-          <option *ngFor="let client of Clients" [value]="client.id_client">
-            {{ client.nom_client }}
-          </option>
-        </select>
-        <button class="btn btn-primary" (click)="ajouterNouveauClient()">
-          <i class="bi bi-plus"></i> <!-- Utilisation de Bootstrap Icons -->
-        </button>
+    <div class="col-md">
+      <div class="form-floating">
+          <select class="form-select" [(ngModel)]="clienselectione" id="client">
+              <option selected>sélectionner ici :</option>
+              <option *ngFor="let client of Clients" [value]="client.id_client">
+                {{ client.nom_client }}
+              </option>
+          </select>
+          <label for="floatingSelectGrid">Sélectionner Client :</label>
       </div>
-    </div>
+  </div>
 
-    <!-- <p><strong>Quantité commandée :</strong> {{ commandeSelectionnee?.quantite_commandee }}</p>
-    <p><strong>Quantité restante :</strong> {{ commandeSelectionnee?.quantite_restante }}</p> -->
     <div class="mb-3">
       <label for="quantitedeCommande" class="form-label">Renseigner la quantité commandée :</label>
       <div class="input-group">
@@ -159,7 +151,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary btn-rounded" (click)="modal.dismiss('cancel')">Annuler</button>
-    <button type="button" class="btn btn-danger btn-rounded" (click)="modal.close('Ok')">Supprimer</button>
+    <button type="button" class="btn btn-danger btn-rounded" (click)="modal.close('confirm')">Supprimer</button>
   </div>
 </ng-template>
 <!-- Modal de Confirmation de Livraison -->

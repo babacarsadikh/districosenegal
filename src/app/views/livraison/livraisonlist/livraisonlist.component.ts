@@ -73,7 +73,7 @@ export class LivraisonlistComponent implements OnInit {
               (this.page - 1) * this.pageSize,  // Début de la page
               (this.page - 1) * this.pageSize + this.pageSize  // Fin de la page
             );
-            console.log(this.commandes)
+           // console.log(this.commandes)
         } else {
           console.error('commandes n\'est pas un tableau.');
         }
@@ -182,6 +182,7 @@ export class LivraisonlistComponent implements OnInit {
     loadInvoices() {
       this.dl.getLivraison()
           .subscribe(res => {
+            //  console.log(res)
               this.commandes=res
               this.commandes = this.commandes['data']
               this.commandes = this.commandes.sort((a, b) => new Date(b.date_production).getTime() - new Date(a.date_production).getTime());

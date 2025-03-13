@@ -63,7 +63,7 @@ onSaveChauffeur(modal: any): void {
   if (this.chauffeur) {
     this.saveitfist (this.chauffeur)
     this.loadChauffeurs();
-   // modal.close();
+     modal.close();
   } else {
     console.error('Formulaire invalide');
   }

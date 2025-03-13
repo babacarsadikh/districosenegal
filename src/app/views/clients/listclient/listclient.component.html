@@ -35,10 +35,10 @@
               <ng-template #noAddress>Aucune adresse</ng-template>
             </td>
             <td>
-              <button class="btn btn-outline-secondary me-3" (click)="openAddAddressModal(invoice)">
+              <!-- <button class="btn btn-outline-secondary me-3" (click)="openAddAddressModal(invoice)">
                 <i class="i-Eye"></i>
-              </button>
-              <button class="btn btn-outline-danger" (click)="deleteInvoice(invoice.id_client, deleteConfirmModal); $event.stopPropagation()">
+              </button> -->
+              <button class="btn btn-outline-danger" (click)="deleteChauffeur(invoice.id_client, deleteConfirmModal); $event.stopPropagation()">
                 <i class="i-Remove-Basket"></i>
               </button>
             </td>
