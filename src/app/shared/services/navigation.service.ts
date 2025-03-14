@@ -132,6 +132,19 @@ export class NavigationService {
         //     { icon: 'i-Calendar', name: 'Calendar', state: '/calendar', type: 'link' },
         // ]
     },
+    {
+      name: 'OPERATEURS',
+      description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',
+      type: 'link',
+      icon: 'i-Business-ManWoman',
+      state: '/operateur'
+      // sub: [
+      //     { icon: 'i-Add-File', name: 'Invoice Builder', state: '/invoice', type: 'link' },
+      //     { icon: 'i-Email', name: 'Inbox', state: '/inbox', type: 'link' },
+      //     { icon: 'i-Speach-Bubble-3', name: 'Chat', state: '/chat', type: 'link' },
+      //     { icon: 'i-Calendar', name: 'Calendar', state: '/calendar', type: 'link' },
+      // ]
+  },
         // {
         //     name: 'Forms',
         //     description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.',

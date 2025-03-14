@@ -58,16 +58,35 @@ saveitfist (valeur){
           console.log(res)
       })
 }
-onSaveChauffeur(modal: any): void {
+// onSaveChauffeur(modal: any): void {
 
-  if (this.chauffeur) {
-    this.saveitfist (this.chauffeur)
-    this.loadChauffeurs();
-     modal.close();
+//   if (this.chauffeur) {
+//     this.saveitfist (this.chauffeur)
+//     this.loadChauffeurs();
+//      modal.close();
+//   } else {
+//     console.error('Formulaire invalide');
+//   }
+// }
+onSaveChauffeur(modal: any): void {
+  if (this.chauffeur && this.chauffeur.nom_chauffeur && this.chauffeur.telephone && this.chauffeur.plaque_camion) {
+    try {
+      this.saveitfist(this.chauffeur);
+      this.loadChauffeurs();
+      modal.close();
+    } catch (error) {
+    // console.error('Erreur lors de l’enregistrement du chauffeur :', error);
+      this.toastr.error('veuillez remplir tous les champs.', 'Erreur');
+
+    }
   } else {
-    console.error('Formulaire invalide');
+   // console.error('Formulaire invalide : veuillez remplir tous les champs.');
+    this.toastr.error('veuillez remplir tous les champs.', 'Erreur');
+
   }
 }
+
+
   loadChauffeurs() {
     this.dl.getAllchauffer()
         .subscribe(res => {

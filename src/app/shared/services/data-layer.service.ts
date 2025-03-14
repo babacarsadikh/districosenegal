@@ -28,8 +28,8 @@ export class DataLayerService {
 
 
     // L'URL de base de l'API Flask locale
-    private apiUrl = 'http://localhost:5000';
-   // private apiUrl = 'https://5854-2001-4278-51-4c8e-11ea-2afb-c1b0-b3ce.ngrok-free.app';
+    //private apiUrl = 'http://localhost:5000';
+   private apiUrl = 'http://50.62.180.5:5000';
 
     constructor(private http: HttpClient) { }
 

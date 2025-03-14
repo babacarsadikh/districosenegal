@@ -98,52 +98,75 @@
     <h4 class="modal-title" id="modal-basic-title">AJOUTER UN CHAUFFEUR</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
+
   <div class="modal-body">
-    <!-- Formulaire avec ngModel -->
-    <!-- Champ Nom -->
-    <div class="form-group mb-3">
-      <label for="nomChauffeur">Nom</label>
-      <input
-        id="nomChauffeur"
-        type="text"
-        class="form-control"
-        [(ngModel)]="chauffeur.nom_chauffeur"
-        name="nom_chauffeur"
-        placeholder="Entrez le nom du chauffeur"
-      />
-    </div>
+    <form #chauffeurForm="ngForm">
+      <!-- Champ Nom -->
+      <div class="form-group mb-3">
+        <label for="nomChauffeur">Nom</label>
+        <input
+          id="nomChauffeur"
+          type="text"
+          class="form-control"
+          [(ngModel)]="chauffeur.nom_chauffeur"
+          name="nom_chauffeur"
+          placeholder="Entrez le nom du chauffeur"
+          required
+        />
+        <div *ngIf="chauffeurForm.submitted && !chauffeur.nom_chauffeur" class="text-danger">
+          Ce champ est requis.
+        </div>
+      </div>
 
-    <!-- Champ Téléphone -->
-    <div class="form-group mb-3">
-      <label for="telephone">Téléphone</label>
-      <input
-        id="telephone"
-        type="text"
-        class="form-control"
-        [(ngModel)]="chauffeur.telephone"
-        name="telephone"
-        placeholder="Entrez le numéro de téléphone"
-      />
-    </div>
+      <!-- Champ Téléphone -->
+      <div class="form-group mb-3">
+        <label for="telephone">Téléphone</label>
+        <input
+          id="telephone"
+          type="text"
+          class="form-control"
+          [(ngModel)]="chauffeur.telephone"
+          name="telephone"
+          placeholder="Entrez le numéro de téléphone"
+          required
+          pattern="^7[07-8][0-9]{7}$"
+        />
+        <div *ngIf="chauffeurForm.submitted && !chauffeur.telephone" class="text-danger">
+          Ce champ est requis.
+        </div>
+        <div *ngIf="chauffeur.telephone && !telephone.valid && chauffeurForm.submitted" class="text-danger">
+          Numéro invalide. Exemple: 77xxxxxxx
+        </div>
+      </div>
 
-    <!-- Champ Plaque Camion -->
-    <div class="form-group mb-3">
-      <label for="plaqueCamion">Plaque Camion</label>
-      <input
-        id="plaqueCamion"
-        type="text"
-        class="form-control"
-        [(ngModel)]="chauffeur.plaque_camion"
-        name="plaque_camion"
-        placeholder="Entrez la plaque du camion"
-      />
-    </div>
+      <!-- Champ Plaque Camion -->
+      <div class="form-group mb-3">
+        <label for="plaqueCamion">Plaque Camion</label>
+        <input
+          id="plaqueCamion"
+          type="text"
+          class="form-control"
+          [(ngModel)]="chauffeur.plaque_camion"
+          name="plaque_camion"
+          placeholder="Entrez la plaque du camion"
+          required
+          pattern="^[A-Z]{2}-\d{4}-[A-Z]{2}$"
+        />
+        <div *ngIf="chauffeurForm.submitted && !chauffeur.plaque_camion" class="text-danger">
+          Ce champ est requis.
+        </div>
+        <div *ngIf="chauffeur.plaque_camion && !plaqueCamion.valid && chauffeurForm.submitted" class="text-danger">
+          Format invalide. Exemple : AA-1234-BB
+        </div>
+      </div>
+    </form>
   </div>
+
   <div class="modal-footer">
     <button
       type="button"
       class="btn btn-outline-dark btn-rounded"
-      (click)="onSaveChauffeur(modal)"
+      (click)="onSaveChauffeur(modal, chauffeurForm)"
     >
       Enregistrer
     </button>
