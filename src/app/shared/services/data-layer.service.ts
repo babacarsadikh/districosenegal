@@ -29,7 +29,7 @@ export class DataLayerService {
 
     // L'URL de base de l'API Flask locale
     //private apiUrl = 'http://localhost:5000';
-   private apiUrl = 'http://50.62.180.5:5000';
+    private apiUrl = 'http://50.62.180.5:5000';
 
     constructor(private http: HttpClient) { }
 
@@ -49,7 +49,9 @@ getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
     getCommandes(): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/commandes`);
     }
-    getCommandesbyDATE(date): Observable<any[]> {
+    login(logindata: any): Observable<any> {
+      return this.http.post<any>(`${this.apiUrl}/operateurs/connexion`, logindata);
+    }    getCommandesbyDATE(date): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/commandes/date?date=${date}`);
     }
   supprimerCommande(idCommande: number): Observable<any> {

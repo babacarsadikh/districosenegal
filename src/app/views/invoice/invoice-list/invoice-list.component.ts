@@ -15,7 +15,7 @@ import { map, startWith } from 'rxjs/operators';
 })
 export class InvoiceListComponent implements OnInit {
   @ViewChild('confirmationLivraisonModal') confirmationLivraisonModal: any;
-    formules = ['C30', 'C25', 'C30 HYDROFUGE']
+    formules = ['C10','C15','C20','C25','C30','C35', 'BÉTON CHAPE','C15 hydrofuge','C25 hydrofuge', 'C30 hydrofuge']
     commandes;
     commandeSelectionnee: any = null;
     quantiteChargee: number = 0;

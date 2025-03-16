@@ -4,6 +4,9 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LocalStoreService {
+  removeItem(arg0: string) {
+    throw new Error("Method not implemented.");
+  }
 
   private ls = window.localStorage;
   constructor() { }

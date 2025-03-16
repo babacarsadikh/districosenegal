@@ -2,22 +2,44 @@
   <div class="row justify-content-center me-0">
     <div class="col-md-6">
       <div class="p-4">
+        <!-- Logo -->
         <div class="auth-logo text-center mb-4">
-          <img src="assets/images/logobeton.png" alt="">
+          <img src="assets/images/logobeton.png" alt="Logo de l'application">
         </div>
+
+        <!-- Titre -->
         <h1 class="mb-3 text-18 text-center">CONNEXION</h1>
+
+        <!-- Formulaire de connexion -->
         <form [formGroup]="signinForm" (ngSubmit)="signin()">
+          <!-- Champ Email -->
           <div class="form-group">
             <label for="email">Adresse mail</label>
-            <input id="email" class="form-control form-control-rounded" formControlName="email" type="email">
+            <input
+              id="email"
+              class="form-control form-control-rounded"
+              formControlName="email"
+              type="email"
+              placeholder="Entrez votre adresse email"
+            >
           </div>
+
+          <!-- Champ Mot de passe -->
           <div class="form-group">
             <label for="password">Mot de passe</label>
-            <input id="password" class="form-control form-control-rounded" formControlName="password" type="password">
+            <input
+              id="password"
+              class="form-control form-control-rounded"
+              formControlName="password"
+              type="password"
+              placeholder="Entrez votre mot de passe"
+            >
           </div>
-          <btn-loading btnClass="btn-primary btn-rounded w-100 mt-3" [loadingText]="loadingText" [loading]="loading">
+
+          <!-- Bouton de connexion -->
+          <button type="submit" class="btn btn-primary btn-rounded w-100 mt-3">
             Se connecter
-          </btn-loading>
+          </button>
         </form>
       </div>
     </div>

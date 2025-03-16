@@ -1,51 +1,65 @@
 import { Component, OnInit } from '@angular/core';
-import { SharedAnimations } from 'src/app/shared/animations/shared-animations';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { AuthService } from '../../../shared/services/auth.service';
-import { Router, RouteConfigLoadStart, ResolveStart, RouteConfigLoadEnd, ResolveEnd } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
-    selector: 'app-signin',
-    templateUrl: './signin.component.html',
-    styleUrls: ['./signin.component.scss'],
-    animations: [SharedAnimations]
+  selector: 'app-signin',
+  templateUrl: './signin.component.html',
+  styleUrls: ['./signin.component.scss']
 })
-export class SigninComponent implements OnInit {
-    loading: boolean;
-    loadingText: string;
-    signinForm: UntypedFormGroup;
-    constructor(
-        private fb: UntypedFormBuilder,
-        private auth: AuthService,
-        private router: Router
-    ) { }
+export class LoginComponent implements OnInit {
+  signinForm: FormGroup; // Formulaire de connexion
+  loading = false; // État de chargement
+  loadingText = 'Connexion en cours...'; // Texte de chargement
+  errorMessage: string | null = null; // Message d'erreur
 
-    ngOnInit() {
-        this.router.events.subscribe(event => {
-            if (event instanceof RouteConfigLoadStart || event instanceof ResolveStart) {
-                this.loadingText = '...';
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService, // Utiliser AuthService
+    private router: Router
+  ) {
+    // Initialisation du formulaire
+    this.signinForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+  }
 
-                this.loading = true;
-            }
-            if (event instanceof RouteConfigLoadEnd || event instanceof ResolveEnd) {
-                this.loading = false;
-            }
-        });
+  ngOnInit(): void {}
 
-        this.signinForm = this.fb.group({
-            email: ['test@example.com', Validators.required],
-            password: ['1234', Validators.required]
-        });
+  // Fonction pour gérer la connexion
+  signin() {
+    if (this.signinForm.invalid) {
+      return;
     }
 
-    signin() {
-        this.loading = true;
-        this.loadingText = 'Connexion en cours ...';
-        this.auth.signin(this.signinForm.value)
-            .subscribe(res => {
-                this.router.navigateByUrl('/dashboard/v2');
-                this.loading = false;
-            });
-    }
+    this.loading = true; // Activer l'état de chargement
+    this.errorMessage = null; // Réinitialiser le message d'erreur
 
+    const credentials = {
+      email: this.signinForm.value.email,
+      password: this.signinForm.value.password
+    };
+
+    // Appel au service d'authentification
+    this.authService.signin(credentials).subscribe(
+      (response) => {
+        this.loading = false; // Désactiver l'état de chargement
+
+        // Rediriger en fonction du rôle
+        const role = this.authService.store.getItem("role");
+        if (role === 'admin') {
+          this.router.navigate(['/admin']); // Redirection vers le tableau de bord admin
+        } else if (role === 'operateur') {
+          this.router.navigate(['/operateur']); // Redirection vers le tableau de bord opérateur
+        }
+      },
+      (error) => {
+        this.loading = false; // Désactiver l'état de chargement
+        this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.'; // Afficher un message d'erreur
+        console.error('Erreur de connexion', error);
+      }
+    );
+  }
 }
