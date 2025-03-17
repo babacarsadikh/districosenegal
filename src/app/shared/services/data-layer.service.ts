@@ -28,7 +28,7 @@ export class DataLayerService {
 
 
     // L'URL de base de l'API Flask locale
-    //private apiUrl = 'http://localhost:5000';
+  //private apiUrl = 'http://localhost:5000';
     private apiUrl = 'http://50.62.180.5:5000';
 
     constructor(private http: HttpClient) { }

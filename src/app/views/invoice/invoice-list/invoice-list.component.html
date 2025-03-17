@@ -45,9 +45,9 @@
             <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.date_production }}</td>
             <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.quantite_restante }}</td>
             <td>
-              <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/invoice/edit', invoice.id_commande]">
+              <!-- <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/invoice/edit', invoice.id_commande]">
                 <i class="i-Eye"></i>
-              </button>
+              </button> -->
               <button class="btn btn-outline-danger" (click)="deleteInvoice(invoice.id_commande, deleteConfirmModal); $event.stopPropagation()">
                 <i class="i-Remove-Basket"></i>
               </button>
