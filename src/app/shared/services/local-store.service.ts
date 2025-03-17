@@ -4,28 +4,29 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class LocalStoreService {
-  removeItem(arg0: string) {
-    throw new Error("Method not implemented.");
-  }
-
   private ls = window.localStorage;
+
   constructor() { }
 
-  public setItem(key, value) {
+  public setItem(key: string, value: any) {
     value = JSON.stringify(value);
     this.ls.setItem(key, value);
     return true;
   }
 
-  public getItem(key) {
+  public getItem(key: string): any {
     const value = this.ls.getItem(key);
     try {
-      return JSON.parse(value);
+      return value ? JSON.parse(value) : null;
     } catch (e) {
-      // console.log(e)
       return null;
     }
   }
+
+  public removeItem(key: string) {
+    this.ls.removeItem(key);
+  }
+
   public clear() {
     this.ls.clear();
   }

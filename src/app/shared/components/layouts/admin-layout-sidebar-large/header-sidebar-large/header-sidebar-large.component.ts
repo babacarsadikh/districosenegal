@@ -17,42 +17,7 @@ export class HeaderSidebarLargeComponent implements OnInit {
       public searchService: SearchService,
       private auth: AuthService
     ) {
-      this.notifications = [
-        {
-          icon: 'i-Speach-Bubble-6',
-          title: 'New message',
-          badge: '3',
-          text: 'James: Hey! are you busy?',
-          time: new Date(),
-          status: 'primary',
-          link: '/chat'
-        },
-        {
-          icon: 'i-Empty-Box',
-          title: 'Product out of stock',
-          text: 'Headphone E67, R98, XL90, Q77',
-          time: new Date('11/10/2023'),
-          status: 'danger',
-          link: '/tables/list'
-        },
-        {
-          icon: 'i-Data-Power',
-          title: 'Server up!',
-          text: 'Server rebooted successfully',
-          time: new Date('11/08/2023'),
-          status: 'success',
-          link: '/dashboard/v2'
-        },
-        {
-          icon: 'i-Data-Block',
-          title: 'Server down!',
-          badge: 'Resolved',
-          text: 'Region 1: Server crashed!',
-          time: new Date('11/06/2023'),
-          status: 'danger',
-          link: '/dashboard/v3'
-        }
-      ];
+      this.notifications = [];
     }
 
     ngOnInit() {

@@ -25,7 +25,6 @@ const components = [
     AuthLayoutComponent,
     BlankLayoutComponent,
 ];
-
 @NgModule({
   imports: [
     NgbModule,
@@ -40,4 +39,4 @@ const components = [
   declarations: components,
   exports: components
 })
-export class LayoutsModule { }
+export class LayoutsModule {}

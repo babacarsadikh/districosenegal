@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from 'src/app/shared/services/auth.service';
 
 @Component({
@@ -17,7 +18,9 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService, // Utiliser AuthService
-    private router: Router
+    private router: Router,
+        private toastr: ToastrService,
+
   ) {
     // Initialisation du formulaire
     this.signinForm = this.fb.group({
@@ -28,38 +31,39 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  // Fonction pour gérer la connexion
-  signin() {
-    if (this.signinForm.invalid) {
-      return;
-    }
-
-    this.loading = true; // Activer l'état de chargement
-    this.errorMessage = null; // Réinitialiser le message d'erreur
-
-    const credentials = {
-      email: this.signinForm.value.email,
-      password: this.signinForm.value.password
-    };
-
-    // Appel au service d'authentification
-    this.authService.signin(credentials).subscribe(
-      (response) => {
-        this.loading = false; // Désactiver l'état de chargement
-
-        // Rediriger en fonction du rôle
-        const role = this.authService.store.getItem("role");
-        if (role === 'admin') {
-          this.router.navigate(['/admin']); // Redirection vers le tableau de bord admin
-        } else if (role === 'operateur') {
-          this.router.navigate(['/operateur']); // Redirection vers le tableau de bord opérateur
-        }
-      },
-      (error) => {
-        this.loading = false; // Désactiver l'état de chargement
-        this.errorMessage = 'Identifiants incorrects. Veuillez réessayer.'; // Afficher un message d'erreur
-        console.error('Erreur de connexion', error);
-      }
-    );
+// Fonction pour gérer la connexion
+signin() {
+  if (this.signinForm.invalid) {
+    return;
   }
+
+  this.loading = true;
+  this.errorMessage = null;
+
+  const credentials = {
+    adresse_email: this.signinForm.value.email, // Changer 'email' en 'adresse_email'
+    motdepasse: this.signinForm.value.password // Changer 'password' en 'motdepasse'
+  };
+
+  //console.log("Données envoyées :", credentials); // Vérifier si les champs sont corrects
+
+  this.authService.signin(credentials).subscribe(
+    (response) => {
+      this.loading = false;
+
+      if (response?.data?.statut === true) {
+        this.toastr.success('Connexion réussie !', 'Succès', { timeOut: 3000 });
+       // this.router.navigate(['/invoice']);
+      }
+    },
+    (error) => {
+      this.loading = false;
+      this.errorMessage = 'Erreur de connexion. Veuillez réessayer.';
+      this.toastr.error(this.errorMessage, 'Erreur', { timeOut: 3000 });
+      console.error('Erreur de connexion', error);
+    }
+  );
+}
+
+
 }
