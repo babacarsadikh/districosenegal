@@ -9,7 +9,7 @@ import { LocalStoreService } from "./local-store.service";
   providedIn: "root"
 })
 export class AuthService {
-  private apiUrl = "http://localhost:5000"; // URL de votre backend Flask
+  private apiUrl = "https://api.districobon.com/"; // URL de votre backend Flask
   authenticated = false; // État d'authentification
 
   constructor(

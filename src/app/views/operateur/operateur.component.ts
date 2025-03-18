@@ -42,7 +42,7 @@ export class OperateurComponent implements OnInit {
 
   // Charger la liste des opérateurs
   loadOperateurs() {
-    this.http.get<any[]>('http://localhost:5000/operateurs').subscribe(
+    this.http.get<any[]>('https://api.districobon.com/operateurs').subscribe(
       (data) => {
         this.operateurs = data;
       },
@@ -97,7 +97,7 @@ export class OperateurComponent implements OnInit {
     this.modalService.open(modal).result.then(
       (result) => {
         if (result === 'Ok') {
-          this.http.delete(`http://localhost:5000/operateurs/${id}`).subscribe(
+          this.http.delete(`https://api.districobon.com/operateurs/${id}`).subscribe(
             (response) => {
               this.toastr.success('Supprimer avec succès !', 'Succès');
 
@@ -126,7 +126,7 @@ export class OperateurComponent implements OnInit {
       motdepasse: this.editOperateurForm.value.motdepasse || undefined // Ne pas envoyer le mot de passe s'il est vide
     };
 
-    this.http.put(`http://localhost:5000/operateurs/${this.selectedOperateur.id}`, updatedOperateur).subscribe(
+    this.http.put(`https://api.districobon.com/operateurs/${this.selectedOperateur.id}`, updatedOperateur).subscribe(
       (response) => {
         console.log(response)
         this.modalService.dismissAll();
