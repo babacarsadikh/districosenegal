@@ -35,19 +35,36 @@
         </thead>
         <tbody>
           <tr *ngFor="let invoice of commandes"
-              [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}"
-              (click)="openLivraisonModal(invoice, ajoutelivraison)">
-            <th [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}" scope="row">{{ invoice.id_commande }}</th>
-            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.nom_client }}</td>
-            <!-- <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.adresse }}</td> -->
-            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.quantite_commandee }}</td>
-            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.formule }}</td>
-            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.date_production }}</td>
-            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">{{ invoice.quantite_restante }}</td>
+              [ngStyle]="{'pointer-events': invoice.quantite_restante === 0 ? 'none' : 'auto'}"
+              (click)="invoice.quantite_restante > 0 ? openLivraisonModal(invoice, ajoutelivraison) : null">
+
+            <!-- Chaque cellule avec ngClass -->
+            <th [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}" scope="row">
+              {{ invoice.id_commande }}
+            </th>
+
+            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
+              {{ invoice.nom_client }}
+            </td>
+
+            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
+              {{ invoice.quantite_commandee }}
+            </td>
+
+            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
+              {{ invoice.formule }}
+            </td>
+
+            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
+              {{ invoice.date_production }}
+            </td>
+
+            <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
+              {{ invoice.quantite_restante }}
+            </td>
+
             <td>
-              <!-- <button class="btn btn-wide btn-outline-secondary me-3" [routerLink]="['/invoice/edit', invoice.id_commande]">
-                <i class="i-Eye"></i>
-              </button> -->
+              <!-- Bouton de suppression -->
               <button class="btn btn-outline-danger" (click)="deleteInvoice(invoice.id_commande, deleteConfirmModal); $event.stopPropagation()">
                 <i class="i-Remove-Basket"></i>
               </button>
@@ -70,29 +87,37 @@
     <p><strong>Quantité restante :</strong> {{ commandeSelectionnee?.quantite_restante }}</p>
     <div class="mb-3">
       <label for="quantiteCharge" class="form-label">Renseigner la quantité chargée :</label>
-      <input type="number" class="form-control" [(ngModel)]="quantiteChargee" id="quantiteCharge" />
+      <input type="number" class="form-control" [(ngModel)]="quantiteChargee" id="quantiteCharge"
+             (input)="validerQuantiteChargee()" />
+      <!-- Message d'erreur -->
+      <div *ngIf="erreurQuantiteChargee" class="text-danger mt-2">
+        La quantité chargée ne peut pas dépasser la quantité restante.
+      </div>
     </div>
     <div class="mb-3">
       <label for="chauffeur" class="form-label">Sélectionner chauffeur :</label>
-      <select class="form-control" [(ngModel)]="chauffeurSelectionne" id="chauffeur">
+      <select class="form-control" [(ngModel)]="chauffeurSelectionne" id="chauffeur" (change)="onChauffeurChange()">
         <option *ngFor="let chauffeur of chauffeurs" [value]="chauffeur.id_chauffeur">
           {{ chauffeur.nom_chauffeur }}
         </option>
       </select>
     </div>
     <div class="mb-3">
+      <label for="plaqueCamion" class="form-label">Plaque Camion :</label>
+      <input type="text" class="form-control" [(ngModel)]="plaqueCamion" id="plaqueCamion" />
+    </div>
+    <div class="mb-3">
       <label for="adresse" class="form-label">Adresse de livraison :</label>
       <input type="text" class="form-control" [(ngModel)]="adresseLivraison" id="adresse" placeholder="Entrez l'adresse de livraison" />
     </div>
-
-
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary btn-rounded" (click)="modal.dismiss('cancel')">Annuler</button>
-    <button type="button" class="btn btn-success btn-rounded" (click)="confirmerLivraison(modal)">Confirmer</button>
+    <button type="button" class="btn btn-success btn-rounded" (click)="confirmerLivraison(modal)" [disabled]="erreurQuantiteChargee">
+      Confirmer
+    </button>
   </div>
 </ng-template>
-
 <!-- Modal Livraison -->
 <ng-template #ajoutecommande let-modal>
   <div class="modal-header">

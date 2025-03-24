@@ -19,12 +19,14 @@ export class InvoiceListComponent implements OnInit {
     commandes;
     commandeSelectionnee: any = null;
     quantiteChargee: number = 0;
+    erreurQuantiteChargee: boolean = false;
     quantitedeCommande: number = 0;
-    chauffeurSelectionne: number =0;
+   // chauffeurSelectionne: number =0;
     clienselectione: number = 0;
     formuleselectione;
     datecommande;
     plaqueCamion: string = '';
+    chauffeurSelectionne: number | null = null; // ID du chauffeur sélectionné
     Clients;
     chauffeurs; // Charger les chauffeurs si nécessaire
     adresses: any[] = []; // Liste des adresses disponibles
@@ -54,6 +56,26 @@ export class InvoiceListComponent implements OnInit {
       return this.adresses.filter(adresse =>
         adresse.adresse.toLowerCase().includes(filterValue)
       );
+    }
+    onChauffeurChange() {
+
+      // Trouver le chauffeur sélectionné dans la liste des chauffeurs
+      const chauffeur = this.chauffeurs.find(c => c.id_chauffeur === +this.chauffeurSelectionne);
+
+      if (chauffeur) {
+        // Pré-remplir la plaque du camion avec celle du chauffeur sélectionné
+        this.plaqueCamion = chauffeur.plaque_camion || '';
+      } else {
+        // Réinitialiser la plaque du camion si aucun chauffeur n'est sélectionné
+        this.plaqueCamion = '';
+      }
+    }
+    validerQuantiteChargee() {
+      if (this.commandeSelectionnee && this.quantiteChargee > this.commandeSelectionnee.quantite_restante) {
+        this.erreurQuantiteChargee = true; // Afficher l'erreur
+      } else {
+        this.erreurQuantiteChargee = false; // Cacher l'erreur
+      }
     }
     loadAdresses() {
       this.dl.getAdressesChantier().subscribe(res => {
@@ -99,20 +121,30 @@ export class InvoiceListComponent implements OnInit {
     }
 
     confirmerLivraison(modal: any) {
-      if (!this.quantiteChargee || !this.chauffeurSelectionne || !this.adresseLivraison) {
+      // Vérification des champs obligatoires
+      if (!this.quantiteChargee || !this.chauffeurSelectionne || !this.adresseLivraison || !this.plaqueCamion) {
         this.toastr.warning('Veuillez renseigner tous les champs.', 'Attention');
         return;
       }
 
+      // Vérification de la commande sélectionnée
       if (!this.commandeSelectionnee) {
         this.toastr.error('Aucune commande sélectionnée.', 'Erreur');
         return;
       }
 
+      // Validation de la quantité chargée
+      if (this.quantiteChargee > this.commandeSelectionnee.quantite_restante) {
+        this.toastr.warning('La quantité chargée ne peut pas dépasser la quantité restante.', 'Attention');
+        return;
+      }
+
+      // Préparation des données pour l'API
       const livraisonData = {
         id_commande: this.commandeSelectionnee.id_commande,
         id_chauffeur: this.chauffeurSelectionne,
         adresse: this.adresseLivraison,
+        plaque_camion: this.plaqueCamion, // Utiliser la valeur saisie par l'utilisateur
         quantite_chargee: this.quantiteChargee,
         heure_depart: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         date_production: new Date().toISOString().split('T')[0]
@@ -120,16 +152,26 @@ export class InvoiceListComponent implements OnInit {
 
       console.log("Données envoyées à l'API :", livraisonData);
 
+      // Appel à l'API pour créer la livraison
       this.dl.createLivraison(livraisonData).subscribe(
         (res) => {
           if (res) {
             this.toastr.success('Livraison ajoutée avec succès !', 'Succès');
-            modal.close();
-            console.log("Réponse API :", res);
-            const donnee = res['data']
-            this.print(donnee)
-            this.loadCommandes();
-            this.commandeSelectionnee = null; // Correction : `clienselectione` n'existe pas
+            modal.close(); // Fermer la modal après succès
+
+            // Ajouter la plaque saisie par l'utilisateur à la réponse de l'API
+            const donnee = { ...res['data'], plaque_camion: this.plaqueCamion };
+
+            // Générer le PDF avec les données mises à jour
+            this.print(donnee); // Imprimer le bon de livraison
+            this.loadCommandes(); // Recharger la liste des commandes
+
+            // Réinitialiser les champs après succès
+            this.commandeSelectionnee = null;
+            this.quantiteChargee = null;
+            this.chauffeurSelectionne = null;
+            this.adresseLivraison = null;
+            this.plaqueCamion = ''; // Réinitialiser la plaque du camion
           } else {
             this.toastr.error('Réponse invalide du serveur.', 'Erreur');
           }
@@ -140,7 +182,6 @@ export class InvoiceListComponent implements OnInit {
         }
       );
     }
-
 
      print(element: any) {
          console.log('Données à imprimer > ', element);
@@ -155,8 +196,10 @@ export class InvoiceListComponent implements OnInit {
            const pageWidth = pdf.internal.pageSize.width; // Largeur de la page
            const logoWidth = 70; // Largeur du logo
            const logoHeight = 40; // Hauteur du logo
-           const logoX = (pageWidth - logoWidth) / 2; // Centrer horizontalement
-           pdf.addImage(img, 'PNG', logoX, 10, logoWidth, logoHeight);
+           const logoX = 1; // Position X du logo (à gauche avec une marge de 10 unités)
+           const logoY = 10; // Position Y du logo (en haut de la page)
+
+           pdf.addImage(img, 'PNG', logoX, logoY, logoWidth, logoHeight);
            // Ajouter un en-tête
            pdf.setFontSize(18);
            pdf.setFont("helvetica", "bold");
@@ -189,7 +232,7 @@ export class InvoiceListComponent implements OnInit {
                ["Quantité restante", `${element.quantite_restante} m³`],
                ["Chauffeur", `${element.nom_chauffeur} `],
                ["Plaque Camion", `${element.plaque_camion} `],
-             ],
+              ],
              theme: "grid",
              styles: {
                fontSize: 11,

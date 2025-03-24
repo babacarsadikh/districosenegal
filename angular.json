@@ -21,11 +21,12 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": [
-                "echarts",
-                "highlight.js",
-                "angular2-text-mask"
-            ],
+           "allowedCommonJsDependencies": [
+    "echarts",
+    "highlight.js",
+    "angular2-text-mask",
+    "jspdf-autotable"
+],
             "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -44,7 +45,7 @@
             "extractLicenses": false,
             "buildOptimizer": false,
             "sourceMap": true,
-            "optimization": false,
+            "optimization": true,
             "namedChunks": true
           },
           "configurations": {
