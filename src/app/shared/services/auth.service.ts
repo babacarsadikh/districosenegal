@@ -29,11 +29,11 @@ export class AuthService {
 
   // Se connecter
   signin(credentials: { adresse_email: string; motdepasse: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/operateurs/connexion`, credentials, {
+    return this.http.post(`${this.apiUrl}/utilisateurs/connexion`, credentials, {
       headers: { 'Content-Type': 'application/json' }
     }).pipe(
       tap((response: any) => {
-        if (response.statut && response.data.etat_connexion === 1) {
+        if (response.statut === true) {
           // Stocker les infos de l'utilisateur
           this.store.setItem("user", response.data);
           this.authenticated = true;
