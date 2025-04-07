@@ -28,8 +28,8 @@ export class DataLayerService {
 
 
     // L'URL de base de l'API Flask locale
- // private apiUrl = 'http://localhost:5000';
-    private apiUrl = 'https://api.districobon.com';
+  //private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = "https://backend.districobon.com/api";
 
     constructor(private http: HttpClient) { }
 
@@ -40,10 +40,10 @@ export class DataLayerService {
       return this.http.get<any[]>(`${this.apiUrl}/livraisons`);
   }
   getLivraisonEvolution (date ) :Observable<any[]>{
-    return this.http.get<any[]>(`${this.apiUrl}/livraisons/evolution/date?date=${date}`);
+    return this.http.get<any[]>(`${this.apiUrl}/livraisons/evolutions?date=${date}`);
 }
 getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
-  return this.http.get<any[]>(`${this.apiUrl}/livraisons/evolution/plage-dates?date_debut=${date_debut}&date_fin=${date_fin}`);
+  return this.http.get<any[]>(`${this.apiUrl}/livraisons/plage-dates?date_debut=${date_debut}&date_fin=${date_fin}`);
 }
 
     getCommandes(): Observable<any[]> {
@@ -51,7 +51,8 @@ getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
     }
     login(logindata: any): Observable<any> {
       return this.http.post<any>(`${this.apiUrl}/operateurs/connexion`, logindata);
-    }    getCommandesbyDATE(date): Observable<any[]> {
+    }
+    getCommandesbyDATE(date): Observable<any[]> {
       return this.http.get<any[]>(`${this.apiUrl}/commandes/date?date=${date}`);
     }
   supprimerCommande(idCommande: number): Observable<any> {

@@ -9,8 +9,8 @@ import { LocalStoreService } from "./local-store.service";
   providedIn: "root"
 })
 export class AuthService {
-  private apiUrl = "https://api.districobon.com/";
-  //private apiUrl = "http://localhost:5000";
+  private apiUrl = "https://backend.districobon.com/api";
+  //private apiUrl = "http://localhost:5000/api";
   authenticated = false; // État d'authentification
 
   constructor(
@@ -29,11 +29,11 @@ export class AuthService {
 
   // Se connecter
   signin(credentials: { adresse_email: string; motdepasse: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/utilisateurs/connexion`, credentials, {
+    return this.http.post(`${this.apiUrl}/connexion`, credentials, {
       headers: { 'Content-Type': 'application/json' }
     }).pipe(
       tap((response: any) => {
-        if (response.statut === true) {
+        if (response.success === true) {
           // Stocker les infos de l'utilisateur
           this.store.setItem("user", response.data);
           this.authenticated = true;

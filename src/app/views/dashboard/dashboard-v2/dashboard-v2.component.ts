@@ -24,6 +24,8 @@ export type ChartOptions = {
   yaxis: any; // Ajout de l'axe Y
   title: any; // Ajout d'un titre
 };
+const API_URL = 'https://api.districobon.com';
+
 @Component({
   selector: 'app-dashboard-v2',
   templateUrl: './dashboard-v2.component.html',
@@ -141,10 +143,46 @@ export class DashboardV2Component implements OnInit {
     this.modalService.open(this.generationrapport, { centered: true });
 
   }
+  transformerDonneesPourPDF(responseData: any) {
+    const transformed = {
+      total_charge: responseData.total_charge || 0,
+      data: {} as any
+    };
+
+    const livraisons = responseData.data;
+
+    // Vérifie si livraisons est bien un tableau
+    if (!Array.isArray(livraisons)) {
+      console.error("Données reçues invalides : 'data' n'est pas un tableau", livraisons);
+      return transformed; // ou return null;
+    }
+
+    livraisons.forEach((livraison: any) => {
+      const client = livraison.nom_client;
+      const formule = livraison.formule;
+
+      if (!transformed.data[client]) {
+        transformed.data[client] = {};
+      }
+
+      if (!transformed.data[client][formule]) {
+        transformed.data[client][formule] = {
+          total_commande: 0,
+          total_charge: 0
+        };
+      }
+
+      transformed.data[client][formule].total_commande += livraison.quantite_commandee ?? 0;
+      transformed.data[client][formule].total_charge += livraison.quantite_chargee ?? 0;
+    });
+
+    return transformed;
+  }
+
   print(data: any) {
+
     console.log("Données à imprimer >", data);
 
-    // Vérifier que les données sont valides
     if (!data || !data.data || typeof data.total_charge === "undefined") {
       console.error("Données invalides ou manquantes.");
       return;
@@ -160,53 +198,53 @@ export class DashboardV2Component implements OnInit {
       const logoHeight = 40;
       const logoX = (pageWidth - logoWidth) / 2;
 
-      // Ajouter le logo
+      // Logo
       pdf.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
 
-      // Titre du rapport
+      // Titre
       pdf.setFontSize(22);
       pdf.setFont("helvetica", "bold");
       pdf.text("RAPPORT DE PRODUCTION", pageWidth / 2, 55, { align: "center" });
 
-      // Date et heure du rapport
+      // Date
       const now = new Date();
       const dateReport = now.toLocaleDateString();
       const heureReport = now.toLocaleTimeString();
 
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "normal");
-      pdf.text(`TOTAL PRODUCTION: ${data.total_charge} m³`, 10, 65);
+      pdf.text(`TOTAL PRODUCTION: ${data.total_charge || 0} m³`, 10, 65);
       pdf.text(`Date: ${dateReport} ${heureReport}`, 10, 72);
 
-      // Ligne de séparation
       pdf.line(10, 78, pageWidth - 10, 78);
 
-      // Préparer les données du tableau récapitulatif
       const summaryData = [];
 
       for (const client in data.data) {
         if (data.data.hasOwnProperty(client)) {
-          for (const formule in data.data[client]) {
-            if (data.data[client].hasOwnProperty(formule)) {
-              const formuleData = data.data[client][formule];
+          const formules = data.data[client];
+          for (const formule in formules) {
+            if (formules.hasOwnProperty(formule)) {
+              const formuleData = formules[formule];
 
-              // Utiliser les totaux fournis plutôt que de recalculer
-              const totalCommandee = formuleData.total_commandee;
-              const totalChargee = formuleData.total_chargee;
+              if (formuleData && typeof formuleData === "object") {
+                const totalCommandee = formuleData.total_commande ?? 0;
+                const totalChargee = formuleData.total_charge ?? 0;
 
-              // Ajouter les totaux au tableau récapitulatif
-              summaryData.push([
-                client,
-                formule,
-                `${totalCommandee} m³`,
-                `${totalChargee} m³`
-              ]);
+                summaryData.push([
+                  client,
+                  formule,
+                  `${totalCommandee} m³`,
+                  `${totalChargee} m³`
+                ]);
+              } else {
+                console.warn(`formuleData null ou invalide pour ${client} / ${formule}`, formuleData);
+              }
             }
           }
         }
       }
 
-      // Ajouter le tableau récapitulatif des totaux par client et formule
       autoTable(pdf, {
         startY: 85,
         head: [["Clients", "Formulations", "Total Commandé", "Total Livré"]],
@@ -229,12 +267,12 @@ export class DashboardV2Component implements OnInit {
         },
       });
 
-      // Ajouter un pied de page
+      // Pied de page
       const pageHeight = pdf.internal.pageSize.height;
       pdf.setFontSize(10);
       pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
 
-      // Ouvrir le PDF dans un nouvel onglet
+      // Ouvrir dans nouvel onglet
       pdf.autoPrint();
       const pdfBlob = pdf.output("bloburl");
       window.open(pdfBlob);
@@ -251,7 +289,7 @@ export class DashboardV2Component implements OnInit {
     this.dl.getCommandesbyDATE(formattedDate)
     .subscribe(res => {
         this.commandes = res['length'];
-      //  console.log(this.commandes)
+         console.log(this.commandes)
 
     });
   }
@@ -291,7 +329,7 @@ export class DashboardV2Component implements OnInit {
     .subscribe(res => {
       console.log('today :',res)
         this.totalalivre = res['total_charge']
-        this.nmbrelivraison = res['length']
+        this.nmbrelivraison = res['total_livraisons']
        // this.print(res)
 
 
@@ -305,8 +343,8 @@ export class DashboardV2Component implements OnInit {
       console.log(res)
         this.rapportData = res['data']
         modal.close();  // Ferme le modal après confirmation
-
-        this.print(res)
+        const donneesPDF = this.transformerDonneesPourPDF(res);
+        this.print(donneesPDF)
 
 
 
@@ -317,7 +355,7 @@ export class DashboardV2Component implements OnInit {
   const formattedDate = today.toISOString().split('T')[0];
   const formattedDatet = `${today.getDate().toString().padStart(2, '0')}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getFullYear()}`;
   this.Datedujour = formattedDatet
-
+    console.log(formattedDate)
     this.dl.getLivraisonEvolution(formattedDate)
     .subscribe(res => {
         this.data = res['data']
