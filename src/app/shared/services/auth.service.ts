@@ -4,27 +4,28 @@ import { Router } from "@angular/router";
 import { Observable, of } from "rxjs";
 import { tap, catchError } from "rxjs/operators";
 import { LocalStoreService } from "./local-store.service";
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 @Injectable({
   providedIn: "root"
 })
 export class AuthService {
   private apiUrl = "https://backend.districobon.com/api";
-  //private apiUrl = "http://localhost:5000/api";
-  authenticated = false; // État d'authentification
+  private jwtHelper = new JwtHelperService();
 
   constructor(
     private http: HttpClient,
     public store: LocalStoreService,
     private router: Router
-  ) {
-    this.checkAuth(); // Vérifier l'état d'authentification au démarrage
-  }
+  ) {}
 
   // Vérifier si l'utilisateur est authentifié
-  checkAuth() {
-    const user = this.store.getItem("user"); // Récupérer les données utilisateur
-    this.authenticated = user && user.etat_connexion === 1; // Vérifier si l'utilisateur est connecté
+  isAuthenticated(): boolean {
+    const token = this.store.getItem('token');
+    const user = this.store.getItem('user');
+
+    // Vérifie si le token existe et n'est pas expiré
+    return !!token && !this.jwtHelper.isTokenExpired(token) && !!user;
   }
 
   // Se connecter
@@ -34,10 +35,10 @@ export class AuthService {
     }).pipe(
       tap((response: any) => {
         if (response.success === true) {
-          // Stocker les infos de l'utilisateur
+          // Stocker le token ET les infos utilisateur
+          this.store.setItem("token", response.token);
           this.store.setItem("user", response.data);
-          this.authenticated = true;
-          this.router.navigate(["/dashboard/v2"]); // Rediriger après connexion
+          this.router.navigate(["/dashboard/v2"]);
         } else {
           console.error("Connexion refusée :", response.message);
         }
@@ -54,10 +55,15 @@ export class AuthService {
     return this.store.getItem("user");
   }
 
+  // Récupérer le token
+  getToken(): string | null {
+    return this.store.getItem("token");
+  }
+
   // Se déconnecter
   signout() {
-    this.store.removeItem("user"); // Supprimer les données utilisateur
-    this.authenticated = false;
+    this.store.removeItem("user");
+    this.store.removeItem("token");
     this.router.navigateByUrl("/sessions/signin");
   }
 }

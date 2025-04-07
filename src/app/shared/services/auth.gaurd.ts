@@ -6,20 +6,17 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class AuthGaurd {
-
   constructor(
     private router: Router,
     private auth: AuthService
   ) { }
 
   canActivate(): boolean {
-    // Vérifie si l'utilisateur est authentifié
-    if (this.auth.authenticated) {
-      return true;  // Si authentifié, permet l'accès à la route protégée
+    if (this.auth.isAuthenticated()) {
+      return true;
     } else {
-      // Si non authentifié, redirige vers la page de connexion
       this.router.navigate(['/sessions/signin']);
-      return false;  // Empêche l'accès à la route protégée
+      return false;
     }
   }
 }
