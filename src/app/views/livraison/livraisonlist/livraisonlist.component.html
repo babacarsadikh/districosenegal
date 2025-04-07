@@ -14,7 +14,6 @@
       <table class="table">
         <thead>
           <tr>
-            <th scope="col">#</th>
             <th scope="col">Nom Client</th>
             <th scope="col">Adresse</th>
             <th scope="col">Quantité Chargée</th>
@@ -24,9 +23,11 @@
           </tr>
         </thead>
         <tbody>
-          @for (com of (commandes ); track com.id) {
-            <tr>
-              <th scope="row">{{ com.id }}</th>
+          <tr
+          *ngFor="let com of commandes | paginate: { itemsPerPage: pageSize, currentPage: page }; let i = index"
+
+
+        >
               <td>{{ com.nom_client }}</td>
               <td>{{ com.adresse }}</td>
               <td>{{ com.quantite_chargee }}</td>
@@ -41,27 +42,15 @@
                 </button>
               </td>
             </tr>
-          }
+
         </tbody>
-      </table>
-         <div class="d-flex justify-content-between p-2">
-                    <!-- <ngb-pagination [collectionSize]="(total$ | async)!" [(page)]="service.page" [pageSize]="service.pageSize">
-                    </ngb-pagination> -->
-                    <!-- <ngb-pagination
-                    [collectionSize]="collectionSize"
-                    [(page)]="page"
-                    [pageSize]="pageSize"
-                    (pageChange)="refreshCountries()"
-                >
-                </ngb-pagination> -->
-
-
-                <!-- <select class="form-select" style="width: auto" [(ngModel)]="pageSize" (ngModelChange)="refreshCountries()">
-                  <option [ngValue]="2">2 items per page</option>
-                  <option [ngValue]="4">4 items per page</option>
-                  <option [ngValue]="6">6 items per page</option>
-                </select> -->
+        <div class="d-flex justify-content-between p-2">
+          <div class="col-md-12 mt-3 d-flex justify-content-center" *ngIf="commandes?.length">
+            <pagination-controls (pageChange)="page = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+          </div>
          </div>
+      </table>
+
     </div>
 
 </div>

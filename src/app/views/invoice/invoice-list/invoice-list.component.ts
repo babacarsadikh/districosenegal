@@ -14,6 +14,9 @@ import { map, startWith } from 'rxjs/operators';
     styleUrls: ['./invoice-list.component.scss']
 })
 export class InvoiceListComponent implements OnInit {
+  allSelected: boolean;
+  page = 1;
+  pageSize = 8;
   @ViewChild('confirmationLivraisonModal') confirmationLivraisonModal: any;
     formules = ['C10','C15','C20','C25','C30','C35', 'BÉTON CHAPE','C15 hydrofuge','C25 hydrofuge', 'C30 hydrofuge','C35/40 hydrofuge']
     commandes;
@@ -96,9 +99,11 @@ export class InvoiceListComponent implements OnInit {
         this.dl.getCommandes()
             .subscribe(res => {
                 this.commandes = res['data'];
-                console.log(this.commandes);
+              //  this.totalItems = this.commandes.length;
+               // console.log(this.commandes);
             });
     }
+
 
     loadChauffeurs() {
         this.dl.getAllchauffer()

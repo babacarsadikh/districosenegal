@@ -26,13 +26,15 @@ declare module 'jspdf' {
 
 })
 export class LivraisonlistComponent implements OnInit {
+  allSelected: boolean;
+  page = 1;
+  pageSize = 8;
     commandes: BonLivraison[];
     countries$: Observable<Country[]>;
     bonCommande$: Observable<BonLivraison[]>;
     total$: Observable<number>;
     headers: any;
-    page = 1;
-	  pageSize = 4;
+
 	  collectionSize ;
 	  countries: Country[];
 

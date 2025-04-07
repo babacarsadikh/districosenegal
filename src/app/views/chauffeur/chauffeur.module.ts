@@ -6,6 +6,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
 import { ListchauffeurComponent } from './listchauffeur/listchauffeur.component';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 
 
@@ -21,7 +22,8 @@ import { ListchauffeurComponent } from './listchauffeur/listchauffeur.component'
     NgbModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    FormsModule
+    FormsModule,
+    NgxPaginationModule
 
 
 

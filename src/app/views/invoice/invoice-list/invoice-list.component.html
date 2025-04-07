@@ -23,7 +23,7 @@
       <table class="table table-hover mb-0">
         <thead>
           <tr>
-            <th scope="col" class="ps-3">#</th>
+            <!-- <th scope="col" class="ps-3">#</th> -->
             <th scope="col">NOM CLIENT</th>
             <!-- <th scope="col">ADDRESSE CHANTIER</th> -->
             <th scope="col">QUANTITÉ</th>
@@ -34,14 +34,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let invoice of commandes"
-              [ngStyle]="{'pointer-events': invoice.quantite_restante === 0 ? 'none' : 'auto'}"
+          <tr *ngFor="let invoice of commandes | paginate: { itemsPerPage: pageSize, currentPage: page }"
+          [ngStyle]="{'pointer-events': invoice.quantite_restante === 0 ? 'none' : 'auto'}"
               (click)="invoice.quantite_restante > 0 ? openLivraisonModal(invoice, ajoutelivraison) : null">
 
             <!-- Chaque cellule avec ngClass -->
-            <th [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}" scope="row">
+            <!-- <th [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}" scope="row">
               {{ invoice.id_commande }}
-            </th>
+            </th> -->
 
             <td [ngClass]="{'quantite-reste-positive': invoice.quantite_restante > 0, 'quantite-reste-nulle': invoice.quantite_restante === 0}">
               {{ invoice.nom_client }}
@@ -71,7 +71,12 @@
             </td>
           </tr>
         </tbody>
+        <div class="col-md-12 mt-3 d-flex justify-content-center" *ngIf="commandes?.length">
+          <pagination-controls (pageChange)="page = $event" previousLabel="Précédent" nextLabel="Suivant"></pagination-controls>
+        </div>
       </table>
+
+
     </div>
   </div>
 </div>

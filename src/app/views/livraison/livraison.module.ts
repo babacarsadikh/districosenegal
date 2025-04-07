@@ -7,6 +7,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
 import { NgxPrintModule } from 'ngx-print';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 
 
@@ -19,7 +20,8 @@ import { NgxPrintModule } from 'ngx-print';
     ReactiveFormsModule,
     SharedComponentsModule,
     NgbModule,
-    NgxPrintModule
+    NgxPrintModule,
+    NgxPaginationModule
 
   ],
   declarations: [LivraisonlistComponent,LivraisondetailsComponent],

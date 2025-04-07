@@ -9,6 +9,7 @@ import { SharedComponentsModule } from 'src/app/shared/components/shared-compone
 import { LivraisonRoutingModule } from '../livraison/livraison-routing.module';
 import { NgxPrintModule } from 'ngx-print';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
         FormsModule,
         ReactiveFormsModule,
         NgxPrintModule,
+        NgxPaginationModule
   ],
   declarations: [ListclientComponent,DetailsclientComponent]
 

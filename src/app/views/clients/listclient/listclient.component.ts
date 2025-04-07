@@ -12,6 +12,9 @@ import { DataLayerService } from 'src/app/shared/services/data-layer.service';
   styleUrl: './listclient.component.scss'
 })
 export class ListclientComponent  implements OnInit {
+  allSelected: boolean;
+  page = 1;
+  pageSize = 8;
   newClientForm: FormGroup;
   addAddressForm: FormGroup;
   selectedClient: any;

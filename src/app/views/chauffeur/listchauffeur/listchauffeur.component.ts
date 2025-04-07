@@ -23,7 +23,9 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class ListchauffeurComponent {
   chauffeurForm: FormGroup;
-
+  allSelected: boolean;
+  page = 1;
+  pageSize = 8;
   confirmResut;
   chauffeurs: any=[];
   countries$: Observable<Country[]>;

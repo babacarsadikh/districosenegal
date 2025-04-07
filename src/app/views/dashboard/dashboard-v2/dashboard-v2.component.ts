@@ -41,7 +41,8 @@ export class DashboardV2Component implements OnInit {
 	products$: any;
   commandes;
   livraison;
-  qtecommandes;
+  qtecommandes: number | null = null;
+
   commandeData;
   nmbrelivraison;
   Datedujour;
@@ -134,10 +135,11 @@ export class DashboardV2Component implements OnInit {
     // Appel des méthodes pour récupérer les données
     this.getLivraison();
     this.getCommandeLength();
-    this.getCommandeQte();
     this.getLivraisonEv();
     this.getCommande();
     this.getLivraisonToday();
+    this.getCommandeQte();
+
   }
   openraaportmodel () {
     this.modalService.open(this.generationrapport, { centered: true });
@@ -296,7 +298,7 @@ export class DashboardV2Component implements OnInit {
   getCommandeQte (){
     this.dl.getCommandes()
     .subscribe(res => {
-        this.qtecommandes = res['total_quantite'];
+      //  this.qtecommandes = res['total_quantite'];
 
     });
 
@@ -307,7 +309,7 @@ export class DashboardV2Component implements OnInit {
     this.dl.getCommandesbyDATE(formattedDate)
     .subscribe(res => {
         this.qtecommandes = res['total_quantite'];
-        console.log('bi',this.qtecommandes)
+       // console.log('bi',this.qtecommandes)
     });
 
   }
