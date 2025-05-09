@@ -5,9 +5,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 
 //const API_URL = 'https://api.districobon.com/operateurs';
-//const API_URL = 'http://127.0.0.1:5000/api/operateurs';
+const API_URL = 'http://127.0.0.1:5000/api/operateurs';
 
-const API_URL = "https://backend.districobon.com/api/operateurs";
+//const API_URL = "https://backend.districobon.com/api/operateurs";
 
 @Component({
   selector: 'app-operateur',

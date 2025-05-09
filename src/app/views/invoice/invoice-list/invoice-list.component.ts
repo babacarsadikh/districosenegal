@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild ,TemplateRef} from '@angular/core';
 import { DataLayerService } from 'src/app/shared/services/data-layer.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
@@ -14,10 +14,14 @@ import { map, startWith } from 'rxjs/operators';
     styleUrls: ['./invoice-list.component.scss']
 })
 export class InvoiceListComponent implements OnInit {
+  selectedCommande: any = null;
+  ajoutQuantite: number = 0;
   allSelected: boolean;
   page = 1;
   pageSize = 8;
   @ViewChild('confirmationLivraisonModal') confirmationLivraisonModal: any;
+  @ViewChild('editQuantiteModal') editQuantiteModal!: TemplateRef<any>;
+
     formules = ['C10','C15','C20','C25','C30','C35', 'BÉTON CHAPE','C15 hydrofuge','C25 hydrofuge', 'C30 hydrofuge','C35/40 hydrofuge']
     commandes;
     commandeSelectionnee: any = null;
@@ -46,7 +50,11 @@ export class InvoiceListComponent implements OnInit {
     ) {
 
      }
-
+     openEditQuantiteModal(commande: any) {
+      this.selectedCommande = commande;
+      this.ajoutQuantite = 0;
+      this.modalService.open(this.editQuantiteModal);
+    }
     ngOnInit() {
         this.loadCommandes();
         this.loadChauffeurs();
@@ -59,6 +67,34 @@ export class InvoiceListComponent implements OnInit {
       return this.adresses.filter(adresse =>
         adresse.adresse.toLowerCase().includes(filterValue)
       );
+    }
+    updateCommande(modal: any) {
+      if (!this.selectedCommande || !this.ajoutQuantite || this.ajoutQuantite <= 0) {
+        return; // sécurité
+      }
+      const ancienneQuantite = parseFloat(this.selectedCommande.quantite_commandee);
+      const ajout = parseFloat(this.ajoutQuantite.toString());
+
+      const nouvelleQuantite = ancienneQuantite + ajout;
+      const dateProduction = this.selectedCommande.date_production?.split('T')[0]; // '2025-05-09T00:00:00.000Z' → '2025-05-09'
+
+      const updatedCommande = {
+        id_client: this.selectedCommande.id_client,
+        formule: this.selectedCommande.formule,
+        quantite_commandee: nouvelleQuantite,
+        date_production: dateProduction
+      };
+
+      this.dl.updateCommande(this.selectedCommande.id_commande, updatedCommande)
+        .subscribe({
+          next: (res) => {
+            this.selectedCommande.quantite_commandee = nouvelleQuantite;
+            modal.close();
+          },
+          error: (err) => {
+            console.error("Erreur lors de la mise à jour :", err);
+          }
+        });
     }
     onChauffeurChange() {
 
@@ -332,5 +368,6 @@ export class InvoiceListComponent implements OnInit {
         }
       );
     }
+
 
 }

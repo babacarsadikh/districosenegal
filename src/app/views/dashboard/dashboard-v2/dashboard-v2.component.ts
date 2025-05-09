@@ -182,12 +182,16 @@ export class DashboardV2Component implements OnInit {
   }
 
   print(data: any) {
-
     console.log("Données à imprimer >", data);
 
-    if (!data || !data.data || typeof data.total_charge === "undefined") {
-      console.error("Données invalides ou manquantes.");
+    // Vérification des données
+    if (!data?.data) {
+      console.error("Données clients manquantes.");
       return;
+    }
+
+    if (typeof data.total_charge === "undefined") {
+      console.warn("Total charge non défini, utilisation de 0 par défaut.");
     }
 
     const pdf = new jsPDF();
@@ -195,10 +199,18 @@ export class DashboardV2Component implements OnInit {
     img.src = "assets/images/logobeton.png";
 
     img.onload = () => {
+      // Constantes de configuration
+      const UNIT = "m³";
       const pageWidth = pdf.internal.pageSize.width;
+      const pageHeight = pdf.internal.pageSize.height;
       const logoWidth = 70;
       const logoHeight = 40;
       const logoX = (pageWidth - logoWidth) / 2;
+
+      // Fonction de formatage
+      const formatNumber = (value: number | undefined) => {
+        return value !== undefined ? value.toFixed(2) : '0.00';
+      };
 
       // Logo
       pdf.addImage(img, "PNG", logoX, 10, logoWidth, logoHeight);
@@ -208,18 +220,20 @@ export class DashboardV2Component implements OnInit {
       pdf.setFont("helvetica", "bold");
       pdf.text("RAPPORT DE PRODUCTION", pageWidth / 2, 55, { align: "center" });
 
-      // Date
+      // Date et informations
       const now = new Date();
       const dateReport = now.toLocaleDateString();
       const heureReport = now.toLocaleTimeString();
 
       pdf.setFontSize(14);
       pdf.setFont("helvetica", "normal");
-      pdf.text(`TOTAL PRODUCTION: ${data.total_charge || 0} m³`, 10, 65);
+      pdf.text(`TOTAL PRODUCTION: ${formatNumber(data.total_charge)} ${UNIT}`, 10, 65);
       pdf.text(`Date: ${dateReport} ${heureReport}`, 10, 72);
 
+      // Ligne de séparation
       pdf.line(10, 78, pageWidth - 10, 78);
 
+      // Préparation des données
       const summaryData = [];
 
       for (const client in data.data) {
@@ -234,19 +248,20 @@ export class DashboardV2Component implements OnInit {
                 const totalChargee = formuleData.total_charge ?? 0;
 
                 summaryData.push([
-                  client,
-                  formule,
-                  `${totalCommandee} m³`,
-                  `${totalChargee} m³`
+                  client || "Client inconnu",
+                  formule || "Formulation non spécifiée",
+                  `${formatNumber(totalCommandee)} ${UNIT}`,
+                  `${formatNumber(totalChargee)} ${UNIT}`
                 ]);
               } else {
-                console.warn(`formuleData null ou invalide pour ${client} / ${formule}`, formuleData);
+                console.warn(`Données invalides pour ${client} / ${formule}`, formuleData);
               }
             }
           }
         }
       }
 
+      // Tableau des données
       autoTable(pdf, {
         startY: 85,
         head: [["Clients", "Formulations", "Total Commandé", "Total Livré"]],
@@ -264,17 +279,22 @@ export class DashboardV2Component implements OnInit {
         bodyStyles: {
           halign: "left",
         },
+        columnStyles: {
+          0: { cellWidth: 40 },  // Colonne Clients
+          1: { cellWidth: 40 },  // Colonne Formulations
+          2: { cellWidth: 30, halign: 'right' },  // Total Commandé
+          3: { cellWidth: 30, halign: 'right' }   // Total Livré
+        },
         alternateRowStyles: {
           fillColor: [245, 245, 245],
         },
       });
 
       // Pied de page
-      const pageHeight = pdf.internal.pageSize.height;
       pdf.setFontSize(10);
       pdf.text("DC BETON - Tous droits réservés.", 10, pageHeight - 10);
 
-      // Ouvrir dans nouvel onglet
+      // Génération du PDF
       pdf.autoPrint();
       const pdfBlob = pdf.output("bloburl");
       window.open(pdfBlob);
