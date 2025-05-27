@@ -20,7 +20,6 @@
           <tr>
             <!-- <th scope="col" class="ps-3">#</th> -->
             <th scope="col">NOM CLIENT</th>
-            <th scope="col">ADRESSES</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
@@ -28,12 +27,7 @@
           <tr *ngFor="let invoice of client  | paginate: { itemsPerPage: pageSize, currentPage: page }" (click)="openAddAddressModal(invoice)" >
               <!-- <th scope="row">{{ invoice.id_client }}</th> -->
             <td>{{ invoice.nom_client }}</td>
-            <td>
-              <ul *ngIf="invoice.adresses.length > 0; else noAddress">
-                <li *ngFor="let adr of invoice.adresses">{{ adr.adresse }}</li>
-              </ul>
-              <ng-template #noAddress>Aucune adresse</ng-template>
-            </td>
+
             <td>
               <!-- <button class="btn btn-outline-secondary me-3" (click)="openAddAddressModal(invoice)">
                 <i class="i-Eye"></i>

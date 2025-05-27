@@ -27,9 +27,8 @@ export class DataLayerService {
     private _total$ = new BehaviorSubject<number>(0);
 
 
-    // L'URL de base de l'API Flask locale
-  private apiUrl = 'http://localhost:5000/api';
-  //private apiUrl = "https://backend.districobon.com/api";
+ // private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = "https://backend.districobon.com/api";
 
     constructor(private http: HttpClient) { }
 
@@ -74,6 +73,10 @@ getLivraisonPlageDate(date_debut: string, date_fin: string): Observable<any[]> {
       return this.http.post<any[]>(`${this.apiUrl}/livraisons`, livraisons);
 
      }
+     addAdresseToClient(id_client: number, adresse: string) {
+  return this.http.post(`/api/adresses`, { id_client, adresse });
+}
+
      createCommande (livraisons: any){
       return this.http.post<any[]>(`${this.apiUrl}/commandes`, livraisons);
 

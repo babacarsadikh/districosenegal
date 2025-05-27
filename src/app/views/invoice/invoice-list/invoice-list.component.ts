@@ -58,7 +58,7 @@ export class InvoiceListComponent implements OnInit {
     ngOnInit() {
         this.loadCommandes();
         this.loadChauffeurs();
-        this.loadAdresses();
+       // this.loadAdresses();
         this.loadClient();
 
     }
@@ -89,6 +89,7 @@ export class InvoiceListComponent implements OnInit {
         .subscribe({
           next: (res) => {
             this.selectedCommande.quantite_commandee = nouvelleQuantite;
+            this.loadCommandes();
             modal.close();
           },
           error: (err) => {
